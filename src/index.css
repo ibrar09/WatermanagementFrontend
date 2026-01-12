@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* Core Theme Transitions */
+html,
+body {
+    transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+/* Light Theme (Default) */
+.theme-light body {
+    @apply bg-gray-50 text-gray-900;
+}
+
+
+/* Premium Dark Glass Theme */
+.theme-gradient body {
+    background: rgb(2, 0, 36);
+    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%) !important;
+    background-attachment: fixed !important;
+    color: white !important;
+}
+
+/* 
+   GLASSMORPHISM OVERRIDES 
+   The goal: Turn "white" cards into "transparent dark glass" cards.
+*/
+
+/* Override bg-white to be transparent glass */
+.theme-gradient .bg-white,
+.theme-gradient .bg-gray-50,
+.theme-gradient .bg-gray-100 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    /* Low opacity white = Glassy */
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Sidebar Specific - slightly different tint */
+.theme-gradient aside {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    /* Darker glass for sidebar */
+    backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Navbar Specific */
+.theme-gradient nav {
+    background-color: rgba(2, 0, 36, 0.8) !important;
+    /* Matches deepest blue */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* TEXT COLOR OVERRIDES */
+/* Force all text to be white or light gray in this theme */
+.theme-gradient .text-gray-900,
+.theme-gradient .text-gray-800,
+.theme-gradient .text-gray-700,
+.theme-gradient .text-gray-600 {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.theme-gradient .text-gray-500,
+.theme-gradient .text-gray-400 {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Inputs needs to be visible */
+.theme-gradient input,
+.theme-gradient select,
+.theme-gradient textarea {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.theme-gradient input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Tables */
+.theme-gradient thead {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-gradient tr:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-gradient td,
+.theme-gradient th {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+@layer utilities {
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
