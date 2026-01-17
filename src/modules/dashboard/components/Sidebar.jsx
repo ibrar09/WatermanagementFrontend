@@ -12,6 +12,7 @@ import {
   Bell,
   Layers,
   FileText,
+  Gauge,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -20,10 +21,11 @@ export default function Sidebar() {
   const menuItems = [
     { name: "Overview", icon: LayoutDashboard, path: "/" },
     { name: "My Inventory", icon: Layers, path: "/inventory" },
-    { name: "Inventory", icon: ChevronRight, path: "/purchase" },
+    { name: "Purchase", icon: ChevronRight, path: "/purchase" },
     { name: "Sales (Out)", icon: ChevronLeft, path: "/sales" },
     { name: "Analytics", icon: BarChart2, path: "/reports" },
     { name: "Production", icon: Users, path: "/production" },
+    { name: "Utilities", icon: Gauge, path: "/utilities" },
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 

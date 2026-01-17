@@ -1,374 +1,248 @@
-
 import React, { useState } from "react";
 import { useData } from "../../../context/DataContext";
-import { PlusCircle, RefreshCw, Trash2, CheckCircle } from "lucide-react";
+import {
+    ShoppingCart,
+    CheckCircle2,
+    AlertCircle,
+    ChevronRight,
+    Plus,
+    Trash2,
+    FileText,
+    Truck,
+    Package,
+    DollarSign
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
+import { Input } from "../../../components/ui/Input";
+import { Badge } from "../../../components/ui/Badge";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "../../../components/ui/Table";
 
-const PRESETS = [
-  { name: "Mineral Water (19L)", category: "Water", price: 250 },
-  { name: "Mineral Water (1.5L Case)", category: "Water", price: 400 },
-  { name: "Mineral Water (500ml Case)", category: "Water", price: 350 },
-  { name: "Water Cooler Unit", category: "Electronics", price: 15000 },
-  { name: "Empty Bottle (19L)", category: "Raw Material", price: 50 },
-];
+const PurchaseForm = () => {
+    const { inventory, addStock, purchases = [] } = useData();
 
-const PurchaseForm = ({ item }) => {
-  const { addStock, transactions } = useData();
-  const [showForm, setShowForm] = useState(false);
+    const [step, setStep] = useState(1);
+    const [vendorDetails, setVendorDetails] = useState({
+        name: "AquaSupplies Ltd",
+        contact: "+92 300 1234567",
+        paymentTerms: "Net 30"
+    });
 
-  // Form State
-  const [formData, setFormData] = useState({
-    categoryName: "",
-    selectCategory: "Water",
-    clientName: "",
-    quantity: "",
-    perPrice: "",
-    totalPrice: "",
-    expiryDate: "",
-    description: "",
-    purchaseDate: new Date().toISOString().split('T')[0],
-    purchaseTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  });
+    const [items, setItems] = useState([
+        { id: 1, name: "Raw Water (Bore)", quantity: 1000, unit: "Liters", cost: 0.5 }
+    ]);
 
-  const handlePresetChange = (e) => {
-    const preset = PRESETS.find(p => p.name === e.target.value);
-    if (preset) {
-      setFormData(prev => ({
-        ...prev,
-        categoryName: preset.name,
-        selectCategory: preset.category,
-        perPrice: preset.price,
-        totalPrice: prev.quantity ? (Number(prev.quantity) * preset.price).toFixed(2) : ""
-      }));
-    }
-  };
+    const calculateTotal = () => items.reduce((acc, item) => acc + (item.quantity * item.cost), 0);
 
-  // Pre-fill form if item is passed (Restock mode)
-  React.useEffect(() => {
-    if (item) {
-      setShowForm(true); // Open form automatically if restocking
-      setFormData(prev => ({
-        ...prev,
-        categoryName: item.name,
-        selectCategory: item.category || "Water",
-        perPrice: item.costPrice || "",
-      }));
-    }
-  }, [item]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "quantity" || name === "perPrice") {
-      const qty = name === "quantity" ? parseFloat(value) : parseFloat(formData.quantity);
-      const price = name === "perPrice" ? parseFloat(value) : parseFloat(formData.perPrice);
-
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        totalPrice: (qty && price) ? (qty * price).toFixed(2) : prev.totalPrice
-      }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleRefresh = () => setFormData({
-    categoryName: "",
-    selectCategory: "",
-    clientName: "",
-    quantity: "",
-    perPrice: "",
-    totalPrice: "",
-    expiryDate: "",
-    description: "",
-    purchaseDate: new Date().toISOString().split('T')[0],
-    purchaseTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.categoryName || !formData.quantity || !formData.perPrice) {
-      alert("Please fill in required fields (Category, Quantity, Price)");
-      return;
-    }
-
-    const newItem = {
-      name: formData.categoryName,
-      category: formData.selectCategory,
-      quantity: Number(formData.quantity),
-      costPrice: Number(formData.perPrice),
-      sellingPrice: Number(formData.perPrice) * 1.5,
-      expiry: formData.expiryDate,
-      description: formData.description,
-      client: formData.clientName,
+    const handleAddItem = () => {
+        setItems([...items, { id: Date.now(), name: "", quantity: 0, unit: "Units", cost: 0 }]);
     };
 
-    addStock(newItem);
-    alert("Purchase Recorded Successfully!");
-    handleRefresh();
-    setShowForm(false); // Return to list after success
-  };
+    const removeItem = (id) => {
+        setItems(items.filter(i => i.id !== id));
+    };
 
-  // RENDER: FORM VIEW
-  if (showForm) {
+    const updateItem = (id, field, value) => {
+        setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
+    };
+
+    const handleSubmit = () => {
+        // In a real app, this would save to a database
+        // For now, we simulate adding to inventory
+        items.forEach(item => {
+            addStock(item.id, item.quantity); // Using addStock from context
+        });
+        alert("Purchase Order Generated & Inventory Updated!");
+        setStep(1);
+        setItems([{ id: Date.now(), name: "", quantity: 0, unit: "Units", cost: 0 }]);
+    };
+
     return (
-      <div className="max-w-5xl mx-auto animate-fade-in">
-        {/* Header with Back Button */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">New Purchase</h1>
-            <p className="text-gray-500">Record incoming stock and inventory.</p>
-          </div>
-          <button
-            onClick={() => setShowForm(false)}
-            className="px-6 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition shadow-sm"
-          >
-            Cancel / Back
-          </button>
+        <div className="max-w-7xl mx-auto space-y-8 animate-fade-in p-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Procurement</h1>
+                    <p className="text-slate-500 mt-1">Manage vendor orders and raw material intake.</p>
+                </div>
+                <Button variant="outline" className="gap-2">
+                    <FileText size={16} /> Purchase History
+                </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left: Form Stepper */}
+                <div className="lg:col-span-2 space-y-6">
+                    <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
+                        <CardHeader>
+                            <div className="flex items-center justify-between mb-4">
+                                <CardTitle>New Purchase Order</CardTitle>
+                                <span className="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-700 rounded-full">STEP {step} OF 3</span>
+                            </div>
+                            {/* Stepper Visual */}
+                            <div className="flex items-center gap-2 w-full">
+                                <div className={`h-2 flex-1 rounded-full transition-colors ${step >= 1 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                                <div className={`h-2 flex-1 rounded-full transition-colors ${step >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                                <div className={`h-2 flex-1 rounded-full transition-colors ${step >= 3 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {step === 1 && (
+                                <div className="space-y-4 animate-slide-up">
+                                    <h3 className="font-bold text-lg text-slate-800">Vendor Details</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase">Vendor Name</label>
+                                            <Input
+                                                value={vendorDetails.name}
+                                                onChange={e => setVendorDetails({ ...vendorDetails, name: e.target.value })}
+                                                className="font-semibold"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase">Contact</label>
+                                            <Input
+                                                value={vendorDetails.contact}
+                                                onChange={e => setVendorDetails({ ...vendorDetails, contact: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div className="space-y-6 animate-slide-up">
+                                    <h3 className="font-bold text-lg text-slate-800">Item Selection</h3>
+                                    {items.map((item, index) => (
+                                        <div key={item.id} className="flex flex-col md:flex-row gap-4 items-end p-4 bg-slate-50 rounded-xl border border-slate-100 relative group">
+                                            <div className="flex-1 space-y-2 w-full">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase">Item Name</label>
+                                                <Input
+                                                    value={item.name}
+                                                    onChange={e => updateItem(item.id, 'name', e.target.value)}
+                                                    placeholder="e.g. Raw Water"
+                                                    list="inventory-list"
+                                                />
+                                            </div>
+                                            <div className="w-24 space-y-2">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase">Qty</label>
+                                                <Input
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    onChange={e => updateItem(item.id, 'quantity', Number(e.target.value))}
+                                                />
+                                            </div>
+                                            <div className="w-24 space-y-2">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase">Cost</label>
+                                                <Input
+                                                    type="number"
+                                                    value={item.cost}
+                                                    onChange={e => updateItem(item.id, 'cost', Number(e.target.value))}
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                                                onClick={() => removeItem(item.id)}
+                                                disabled={items.length === 1}
+                                            >
+                                                <Trash2 size={18} />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    <Button onClick={handleAddItem} variant="outline" className="w-full border-dashed">
+                                        <Plus size={16} className="mr-2" /> Add Another Item
+                                    </Button>
+                                </div>
+                            )}
+
+                            {step === 3 && (
+                                <div className="space-y-6 animate-slide-up">
+                                    <h3 className="font-bold text-lg text-slate-800">Review Purchase Order</h3>
+                                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                                        <div className="flex justify-between mb-4 pb-4 border-b border-slate-200">
+                                            <span className="text-slate-500">Vendor</span>
+                                            <span className="font-bold text-slate-900">{vendorDetails.name}</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {items.map(item => (
+                                                <div key={item.id} className="flex justify-between text-sm">
+                                                    <span>{item.name || "Untitled Item"} (x{item.quantity})</span>
+                                                    <span className="font-mono font-bold">${(item.quantity * item.cost).toFixed(2)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="flex justify-between mt-6 pt-4 border-t border-slate-300">
+                                            <span className="text-lg font-black text-slate-900">Total</span>
+                                            <span className="text-lg font-black text-emerald-600">${calculateTotal().toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="flex justify-between pt-6">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setStep(Math.max(1, step - 1))}
+                                    disabled={step === 1}
+                                >
+                                    Back
+                                </Button>
+                                {step < 3 ? (
+                                    <Button onClick={() => setStep(step + 1)} className="px-8">
+                                        Next Step <ChevronRight size={16} className="ml-2" />
+                                    </Button>
+                                ) : (
+                                    <Button onClick={handleSubmit} className="px-8 bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 shadow-lg">
+                                        <CheckCircle2 size={16} className="mr-2" /> Confirm Order
+                                    </Button>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Right: Summary / History Preview */}
+                <div className="space-y-6">
+                    <Card className="bg-slate-900 text-white border-none shadow-2xl">
+                        <CardHeader>
+                            <CardTitle className="text-white flex items-center gap-2">
+                                <Truck className="text-blue-400" /> Active Orders
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between">
+                                    <div>
+                                        <p className="font-bold">#PO-2491</p>
+                                        <p className="text-xs text-slate-400">Chemicals (Cl, O3)</p>
+                                    </div>
+                                    <Badge className="bg-blue-500/20 text-blue-300 border-none">On Route</Badge>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between">
+                                    <div>
+                                        <p className="font-bold">#PO-2490</p>
+                                        <p className="text-xs text-slate-400">500ml Preforms</p>
+                                    </div>
+                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-none">Received</Badge>
+                                </div>
+                            </div>
+                            <Button className="w-full mt-6 bg-white/10 hover:bg-white/20 text-white border-none">
+                                View All Purchases
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
+            {/* Inventory Datalist for Auto-complete */}
+            <datalist id="inventory-list">
+                {inventory.map(i => <option key={i.id} value={i.name} />)}
+            </datalist>
+
         </div>
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Section */}
-            <div className="space-y-6">
-
-              {/* Quick Preset Select */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Quick Select (Optional)</label>
-                <select onChange={handlePresetChange} className="w-full pl-4 py-3 bg-indigo-50 border border-indigo-100 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-700 font-medium">
-                  <option value="">-- Select Standard Item --</option>
-                  {PRESETS.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
-                </select>
-              </div>
-
-              {/* Category Name (Item Name) */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Item Name / Category</label>
-                <input
-                  type="text"
-                  name="categoryName"
-                  value={formData.categoryName}
-                  onChange={handleChange}
-                  placeholder="e.g. Mineral Water Bottle"
-                  className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
-
-              {/* Select Category */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Type</label>
-                <div className="relative">
-                  <select
-                    name="selectCategory"
-                    value={formData.selectCategory}
-                    onChange={handleChange}
-                    className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none"
-                  >
-                    <option value="Water">Water</option>
-                    <option value="Electronics">Bottel</option>
-                    <option value="Stationary">Labels</option>
-                    <option value="Raw Material">Raw Material</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Client Name */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Supplier / Client Name</label>
-                <input
-                  type="text"
-                  name="clientName"
-                  value={formData.clientName}
-                  onChange={handleChange}
-                  placeholder="e.g. Nestle Distributor"
-                  className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
-
-              {/* Quantity */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Quantity</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  placeholder="0"
-                  className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
-
-              {/* Price (2 columns) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Cost Per Unit</label>
-                  <input
-                    type="number"
-                    name="perPrice"
-                    value={formData.perPrice}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Total Cost</label>
-                  <input
-                    type="number"
-                    name="totalPrice"
-                    value={formData.totalPrice}
-                    readOnly
-                    className="w-full pl-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              {/* Expiry Date */}
-              <div className="space-y-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Expiry Date</label>
-                <input
-                  type="date"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Right Section */}
-            <div className="space-y-6 flex flex-col h-full">
-              {/* Description */}
-              <div className="space-y-1 flex-1">
-                <label className="text-sm font-semibold text-gray-700 ml-1">Description / Notes</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Enter details about the batch condition, driver name, etc."
-                  className="w-full h-full min-h-[160px] p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
-                />
-              </div>
-
-              {/* Purchase Date & Time */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Date</label>
-                  <input
-                    type="date"
-                    name="purchaseDate"
-                    value={formData.purchaseDate}
-                    onChange={handleChange}
-                    className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Time</label>
-                  <input
-                    type="time"
-                    name="purchaseTime"
-                    value={formData.purchaseTime}
-                    onChange={handleChange}
-                    className="w-full pl-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-4 mt-auto pt-4">
-                <button
-                  type="button"
-                  onClick={handleRefresh}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium"
-                >
-                  <Trash2 size={20} />
-                  Clear
-                </button>
-
-                <button
-                  type="submit"
-                  className="flex-[2] flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition font-medium"
-                >
-                  <PlusCircle size={20} />
-                  Record Purchase
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
     );
-  }
-
-  // RENDER: LIST VIEW
-  const purchaseHistory = transactions.filter(t => t.type === 'BUY');
-
-  return (
-    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Purchases (In)</h1>
-          <p className="text-gray-500 mt-1">Manage inbound stock and supplier records.</p>
-        </div>
-
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition"
-        >
-          <PlusCircle size={20} />
-          New Purchase
-        </button>
-      </div>
-
-      {/* Purchase List Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-
-        {purchaseHistory.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50/50 text-xs font-bold text-gray-500 uppercase tracking-wider text-left border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-4">ID</th>
-                  <th className="px-6 py-4">Item Name</th>
-                  <th className="px-6 py-4">Supplier</th>
-                  <th className="px-6 py-4">Quantity</th>
-                  <th className="px-6 py-4">Cost</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {purchaseHistory.map((t) => (
-                  <tr key={t.id} className="hover:bg-gray-50/50 transition">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-400">#{t.id}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-800">{t.itemName}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{t.client || "Unknown"}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-blue-600">+{t.quantity}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-800">${t.total}</td>
-                    <td className="px-6 py-4 text-xs text-gray-400">{t.date}</td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">Received</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-              <RefreshCw size={24} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-700">No Purchases Yet</h3>
-            <p className="text-gray-500 mt-1">Start by adding new stock to the inventory.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 };
 
 export default PurchaseForm;

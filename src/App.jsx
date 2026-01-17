@@ -7,6 +7,8 @@ import PurchaseForm from "./modules/dashboard/pages/PurchaseForm";
 import SalesModule from "./modules/dashboard/pages/SalesModule";
 import Reports from "./modules/dashboard/pages/Reports";
 import ProductDetails from "./modules/dashboard/pages/ProductDetails";
+import UtilitiesAndConsumables from "./modules/dashboard/pages/UtilitiesAndConsumables";
+import Settings from "./modules/dashboard/pages/Settings";
 import { DataProvider } from "./context/DataContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -69,6 +71,22 @@ export default function App() {
               element={
                 <DashboardLayout>
                   <ProductDetails />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/utilities"
+              element={
+                <DashboardLayout>
+                  <UtilitiesAndConsumables />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <DashboardLayout>
+                  <Settings />
                 </DashboardLayout>
               }
             />

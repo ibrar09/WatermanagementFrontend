@@ -1,51 +1,21 @@
 import React, { useState, useMemo } from "react";
 import { useData } from "../../../context/DataContext";
 import {
-    ShoppingCart,
-    Users,
-    History,
-    Search,
-    Plus,
-    CreditCard,
-    Wallet,
-    ArrowUpRight,
-    ArrowDownRight,
-    Clock,
-    CheckCircle2,
-    AlertCircle,
-    MoreVertical,
-    ChevronRight,
-    Filter,
-    DollarSign,
-    UserPlus
+    ShoppingCart, Users, History, Search, Plus, CreditCard, Wallet,
+    ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, AlertCircle,
+    MoreVertical, ChevronRight, Filter, DollarSign, UserPlus, X, Activity
 } from "lucide-react";
-
-// Helper components
-const Card = ({ children, className = "" }) => (
-    <div className={`bg-white dark:bg-white/10 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 ${className}`}>
-        {children}
-    </div>
-);
-
-const Badge = ({ children, variant = "neutral" }) => {
-    const styles = {
-        neutral: "bg-gray-100 text-gray-700",
-        success: "bg-green-100 text-green-700",
-        warning: "bg-yellow-100 text-yellow-700",
-        danger: "bg-red-100 text-red-700",
-        info: "bg-blue-100 text-blue-700"
-    };
-    return (
-        <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${styles[variant]}`}>
-            {children}
-        </span>
-    );
-};
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
+import { Input } from "../../../components/ui/Input";
+import { Badge } from "../../../components/ui/Badge";
+import {
+    Table, TableHeader, TableBody, TableHead, TableRow, TableCell
+} from "../../../components/ui/Table";
 
 const SalesModule = () => {
     const { inventory, transactions, customers, sellStock, addCustomer, collectPayment } = useData();
     const [activeTab, setActiveTab] = useState("new-sale");
-    const [searchQuery, setSearchQuery] = useState("");
 
     // New Sale State
     const [saleForm, setSaleForm] = useState({
@@ -110,197 +80,285 @@ const SalesModule = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6 animate-fade-in p-2 sm:p-4">
+        <div className="max-w-7xl mx-auto space-y-8 animate-fade-in p-2 sm:p-4">
             {/* Header & Stats */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-gray-900 dark:text-white flex items-center gap-3 tracking-tight">
-                        <ShoppingCart className="text-blue-600" size={36} />
-                        Sales Module
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold uppercase tracking-widest rounded-md">Transactions</div>
+                    </div>
+                    <h1 className="text-4xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
+                        <ShoppingCart className="text-indigo-600" size={36} />
+                        Sales Terminal
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium italic">Manage sales, customers, and outstanding balances.</p>
+                    <p className="text-slate-500 mt-1 font-medium">Manage point of sale, customer ledgers, and receivables.</p>
                 </div>
 
                 <div className="flex gap-4 w-full lg:w-auto">
-                    <Card className="flex-1 lg:w-48 p-4 bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-500/20">
-                        <p className="text-[10px] font-black text-green-600/60 uppercase tracking-widest">Total Sales</p>
-                        <p className="text-2xl font-black text-green-600">${totalRevenue.toLocaleString()}</p>
+                    <Card className="flex-1 lg:min-w-[240px] border-l-0 border-y-0 border-r-[6px] border-r-emerald-500 bg-white shadow-md hover:shadow-xl transition-all">
+                        <CardContent className="p-5">
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                                    <DollarSign size={20} />
+                                </div>
+                                <Activity className="text-emerald-500" size={16} />
+                            </div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Revenue</p>
+                            <p className="text-3xl font-black text-slate-900">${totalRevenue.toLocaleString()}</p>
+                        </CardContent>
                     </Card>
-                    <Card className="flex-1 lg:w-48 p-4 bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-500/20">
-                        <p className="text-[10px] font-black text-red-600/60 uppercase tracking-widest">Outstanding</p>
-                        <p className="text-2xl font-black text-red-600">${totalOutstanding.toLocaleString()}</p>
+                    <Card className="flex-1 lg:min-w-[240px] border-l-0 border-y-0 border-r-[6px] border-r-rose-500 bg-white shadow-md hover:shadow-xl transition-all">
+                        <CardContent className="p-5">
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="p-2 bg-rose-100 rounded-lg text-rose-600">
+                                    <AlertCircle size={20} />
+                                </div>
+                            </div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Outstanding Debt</p>
+                            <p className="text-3xl font-black text-slate-900">${totalOutstanding.toLocaleString()}</p>
+                        </CardContent>
                     </Card>
                 </div>
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex bg-white dark:bg-white/5 p-1 rounded-2xl border border-gray-100 dark:border-white/10 shadow-sm w-fit">
+            <div className="flex bg-muted p-1 rounded-xl w-fit">
                 {[
                     { id: "new-sale", icon: Plus, label: "Process Sale" },
                     { id: "customers", icon: Users, label: "Customer Ledger" },
                     { id: "history", icon: History, label: "History" }
                 ].map(tab => (
-                    <button
+                    <Button
                         key={tab.id}
+                        variant={activeTab === tab.id ? "default" : "ghost"}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
-                                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
-                                : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"
-                            }`}
+                        className="gap-2 rounded-lg"
                     >
                         <tab.icon size={18} />
                         <span className="hidden sm:inline">{tab.label}</span>
-                    </button>
+                    </Button>
                 ))}
             </div>
 
             <div className="mt-4">
                 {/* NEW SALE TAB */}
                 {activeTab === "new-sale" && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 animate-fade-in">
                         {/* Left: POS Form */}
-                        <Card className="lg:col-span-2 p-8 shadow-xl">
-                            <h3 className="text-2xl font-black text-gray-800 dark:text-white mb-8 flex items-center gap-2">
-                                <CreditCard className="text-blue-600" /> New Transaction
-                            </h3>
+                        <Card className="xl:col-span-2 shadow-xl border-none ring-1 ring-slate-100 bg-white">
+                            <CardHeader className="border-b border-slate-100 pb-6">
+                                <CardTitle className="flex items-center gap-3 text-slate-800">
+                                    <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                                        <CreditCard size={24} />
+                                    </div>
+                                    New Transaction
+                                </CardTitle>
+                                <CardDescription>Process a new sale and update inventory instantly.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="pt-8">
+                                <form onSubmit={handleProcessSale} className="space-y-8">
 
-                            <form onSubmit={handleProcessSale} className="space-y-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Customer / Client</label>
+                                    {/* SECTION 1: CUSTOMER */}
+                                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                                                <Users size={16} /> Customer Details
+                                            </h3>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowAddCustomer(true)}
+                                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-8 text-xs font-bold"
+                                            >
+                                                + Register New
+                                            </Button>
+                                        </div>
                                         <div className="relative">
                                             <select
                                                 value={saleForm.clientName}
                                                 onChange={(e) => setSaleForm({ ...saleForm, clientName: e.target.value })}
-                                                className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold appearance-none transition-all"
+                                                className="w-full h-12 pl-4 pr-10 bg-white border-none shadow-sm rounded-xl font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 appearance-none transition-all"
                                             >
                                                 <option value="Walk-in">Walk-in Customer</option>
                                                 {customers.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                             </select>
-                                            <ChevronRight className="absolute right-4 top-5 text-gray-400 rotate-90" size={20} />
+                                            <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" size={16} />
                                         </div>
                                     </div>
 
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quick Add</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowAddCustomer(true)}
-                                            className="w-full p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 rounded-2xl border border-blue-100 dark:border-blue-500/20 font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition"
-                                        >
-                                            <UserPlus size={18} /> New Customer
-                                        </button>
-                                    </div>
-                                </div>
+                                    {/* SECTION 2: PRODUCT */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-black text-slate-700 uppercase tracking-widest flex items-center gap-2 px-1">
+                                            <ShoppingCart size={16} /> Cart Items
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="space-y-1.5 md:col-span-2">
+                                                <label className="text-xs font-bold text-slate-400 ml-1">Select Product</label>
+                                                <div className="relative group">
+                                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
+                                                    <Input
+                                                        list="inventory-list"
+                                                        value={saleForm.itemName}
+                                                        onChange={(e) => {
+                                                            const item = inventory.find(i => i.name === e.target.value);
+                                                            setSaleForm({
+                                                                ...saleForm,
+                                                                itemName: e.target.value,
+                                                                sellingPrice: item ? item.sellingPrice : ""
+                                                            });
+                                                        }}
+                                                        className="h-14 pl-12 text-lg font-bold bg-white border-slate-200 focus:border-indigo-500 rounded-xl"
+                                                        placeholder="Search product..."
+                                                    />
+                                                    {selectedItem && (
+                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-xs font-bold border border-emerald-100 flex items-center gap-1">
+                                                            <CheckCircle2 size={12} /> {selectedItem.quantity} in stock
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
 
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Product</label>
-                                    <div className="relative">
-                                        <input
-                                            list="inventory-list"
-                                            value={saleForm.itemName}
-                                            onChange={(e) => {
-                                                const item = inventory.find(i => i.name === e.target.value);
-                                                setSaleForm({
-                                                    ...saleForm,
-                                                    itemName: e.target.value,
-                                                    sellingPrice: item ? item.sellingPrice : ""
-                                                });
-                                            }}
-                                            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold"
-                                            placeholder="Search items for sale..."
-                                        />
-                                        <Search className="absolute right-4 top-4 text-gray-400" size={20} />
-                                    </div>
-                                    {selectedItem && (
-                                        <p className="text-[10px] font-bold text-green-600 ml-1 mt-1">Available Stock: {selectedItem.quantity} units</p>
-                                    )}
-                                </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-slate-400 ml-1">Quantity</label>
+                                                <Input
+                                                    type="number"
+                                                    value={saleForm.quantity}
+                                                    onChange={(e) => setSaleForm({ ...saleForm, quantity: e.target.value })}
+                                                    className="h-14 text-center text-2xl font-black text-slate-800 bg-slate-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-xl"
+                                                    placeholder="0"
+                                                />
+                                            </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity</label>
-                                        <input
-                                            type="number"
-                                            value={saleForm.quantity}
-                                            onChange={(e) => setSaleForm({ ...saleForm, quantity: e.target.value })}
-                                            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl outline-none font-black text-2xl text-blue-600"
-                                            placeholder="0"
-                                        />
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-slate-400 ml-1">Price / Unit ($)</label>
+                                                <Input
+                                                    type="number"
+                                                    value={saleForm.sellingPrice}
+                                                    onChange={(e) => setSaleForm({ ...saleForm, sellingPrice: e.target.value })}
+                                                    className="h-14 text-center text-xl font-bold text-slate-600 bg-slate-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-xl"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit Price ($)</label>
-                                        <input
-                                            type="number"
-                                            value={saleForm.sellingPrice}
-                                            onChange={(e) => setSaleForm({ ...saleForm, sellingPrice: e.target.value })}
-                                            className="w-full p-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl outline-none font-bold"
-                                            placeholder="0.00"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Amount Paid ($)</label>
-                                        <input
-                                            type="number"
-                                            value={saleForm.amountPaid}
-                                            onChange={(e) => setSaleForm({ ...saleForm, amountPaid: e.target.value })}
-                                            className="w-full p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-500/20 rounded-2xl outline-none font-black text-green-600"
-                                            placeholder="Collecting now..."
-                                        />
-                                    </div>
-                                </div>
 
-                                <button
-                                    type="submit"
-                                    className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl shadow-xl shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-3"
-                                >
-                                    <ShoppingCart size={24} /> Confirm Sale Transaction
-                                </button>
-                            </form>
+                                    {/* SECTION 3: PAYMENT */}
+                                    <div className="p-6 bg-slate-900 text-white rounded-2xl shadow-xl shadow-slate-200 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                                            <DollarSign size={100} />
+                                        </div>
+
+                                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                                            <div className="space-y-3">
+                                                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <Wallet size={16} /> Payment Entry
+                                                </h3>
+                                                <div className="flex gap-2">
+                                                    {[10, 20, 50, 100].map(amt => (
+                                                        <button
+                                                            key={amt}
+                                                            type="button"
+                                                            onClick={() => setSaleForm({ ...saleForm, amountPaid: amt })}
+                                                            className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold transition-colors"
+                                                        >
+                                                            ${amt}
+                                                        </button>
+                                                    ))}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSaleForm({ ...saleForm, amountPaid: (Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)) })}
+                                                        className="px-3 py-1 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg text-xs font-bold transition-colors border border-emerald-500/50"
+                                                    >
+                                                        Exact
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-bold text-slate-400">Total Received ($)</label>
+                                                <Input
+                                                    type="number"
+                                                    value={saleForm.amountPaid}
+                                                    onChange={(e) => setSaleForm({ ...saleForm, amountPaid: e.target.value })}
+                                                    className="h-16 text-right text-3xl font-black text-emerald-400 bg-white/5 border-white/10 focus:border-emerald-500 rounded-xl placeholder:text-slate-700"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="submit"
+                                        size="lg"
+                                        className="w-full h-16 text-lg uppercase tracking-widest font-black shadow-xl shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700 hover:scale-[1.01] transition-all rounded-xl"
+                                    >
+                                        <CheckCircle2 size={24} className="mr-3" /> Confirm & Print Receipt
+                                    </Button>
+                                </form>
+                            </CardContent>
                         </Card>
 
                         {/* Right: Receipt Preview */}
                         <div className="space-y-6">
-                            <Card className="p-8 h-full flex flex-col bg-gray-900 text-white border-none shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-8 opacity-10">
-                                    <Wallet size={120} />
-                                </div>
+                            <Card className="h-full flex flex-col bg-white border border-slate-200 shadow-2xl relative">
+                                {/* Receipt Top jagged edge (simulated with CSS or keep simple) */}
+                                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-slate-200 to-slate-100" />
 
-                                <h3 className="text-lg font-black uppercase tracking-widest text-blue-400 mb-8 pb-4 border-b border-white/10">Summary</h3>
+                                <CardContent className="p-8 h-full flex flex-col relative">
+                                    <div className="text-center pb-6 border-b-2 border-dashed border-slate-200 mb-6">
+                                        <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl shadow-lg">W</div>
+                                        <h3 className="text-lg font-black uppercase tracking-widest text-slate-900">Official Receipt</h3>
+                                        <p className="text-xs text-slate-400 font-medium">WaterSys Logistics Inc.</p>
+                                        <p className="text-[10px] text-slate-300 mt-1">{new Date().toLocaleDateString()} • {new Date().toLocaleTimeString()}</p>
+                                    </div>
 
-                                <div className="flex-1 space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-400 text-sm font-bold">Product</span>
-                                        <span className="font-extrabold">{saleForm.itemName || "None"}</span>
+                                    <div className="flex-1 space-y-4 font-mono text-sm">
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-slate-500 font-bold">Billed To:</span>
+                                            <span className="font-bold text-slate-900 text-right max-w-[150px]">{saleForm.clientName}</span>
+                                        </div>
+
+                                        <div className="py-4 border-y border-dashed border-slate-100 space-y-3 my-4">
+                                            <div className="flex justify-between items-center text-slate-900">
+                                                <span className="font-bold">{saleForm.itemName || "Item"}</span>
+                                                <span>x{saleForm.quantity || 0}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-slate-500 text-xs">
+                                                <span>@ ${Number(saleForm.sellingPrice || 0).toFixed(2)} / unit</span>
+                                                <span className="font-bold text-slate-800">${(Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 pt-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-bold">Subtotal</span>
+                                                <span className="font-bold text-slate-900">${(Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)).toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 font-bold">Tax (0%)</span>
+                                                <span className="font-bold text-slate-900">$0.00</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-lg pt-2 border-t border-slate-200">
+                                                <span className="font-black text-slate-900">TOTAL</span>
+                                                <span className="font-black text-indigo-600">${(Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)).toLocaleString()}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-400 text-sm font-bold">Customer</span>
-                                        <span className="font-extrabold">{saleForm.clientName}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-400 text-sm font-bold">Qty</span>
-                                        <span className="font-extrabold">{saleForm.quantity || 0}</span>
-                                    </div>
-                                    <div className="py-4 border-t border-dashed border-white/10">
+
+                                    <div className="mt-8 pt-6 border-t-2 border-dashed border-slate-200">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-gray-400 text-sm font-bold">Subtotal</span>
-                                            <span className="font-extrabold text-xl">${(Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)).toLocaleString()}</span>
+                                            <span className="text-xs font-bold text-slate-500 uppercase">Paid Amount</span>
+                                            <span className="font-bold text-emerald-600">${Number(saleForm.amountPaid || 0).toLocaleString()}</span>
                                         </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-400 text-sm font-bold">Paid</span>
-                                            <span className="font-extrabold text-green-400">${Number(saleForm.amountPaid || 0).toLocaleString()}</span>
+                                        <div className="bg-slate-50 p-4 rounded-xl flex justify-between items-center border border-slate-100">
+                                            <p className="text-xs font-black uppercase tracking-widest text-rose-500">Balance Due</p>
+                                            <p className="text-2xl font-black text-rose-600">
+                                                ${Math.max(0, (Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)) - Number(saleForm.amountPaid || 0)).toLocaleString()}
+                                            </p>
                                         </div>
+                                        <p className="text-[10px] text-center text-slate-300 mt-6 uppercase tracking-widest font-bold">Thank you for your business</p>
                                     </div>
-                                </div>
-
-                                <div className="mt-8 pt-8 border-t border-white/10">
-                                    <div className="bg-white/5 p-4 rounded-xl flex justify-between items-center">
-                                        <p className="text-xs font-black uppercase tracking-widest text-red-400">Balance Due</p>
-                                        <p className="text-3xl font-black text-white">
-                                            ${Math.max(0, (Number(saleForm.quantity || 0) * Number(saleForm.sellingPrice || 0)) - Number(saleForm.amountPaid || 0)).toLocaleString()}
-                                        </p>
-                                    </div>
-                                </div>
+                                </CardContent>
                             </Card>
                         </div>
                     </div>
@@ -310,42 +368,61 @@ const SalesModule = () => {
                 {activeTab === "customers" && (
                     <div className="space-y-8 animate-fade-in">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {customers.map(c => (
-                                <Card key={c.id} className="p-6 transition-all hover:shadow-lg hover:border-blue-500 group">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 font-black text-xl">
-                                            {c.name.charAt(0)}
-                                        </div>
-                                        <Badge variant={c.balance > 0 ? "warning" : "success"}>
-                                            {c.balance > 0 ? "DEBTOR" : "CLEAR"}
-                                        </Badge>
-                                    </div>
-                                    <h3 className="font-black text-gray-800 dark:text-white text-lg">{c.name}</h3>
-                                    <p className="text-xs text-gray-400 font-bold mb-4">{c.phone || "No contact"}</p>
+                            {customers.map(c => {
+                                const isDebtor = c.balance > 0;
+                                const borderColor = isDebtor ? "border-r-rose-500" : "border-r-emerald-500";
+                                const bgBadge = isDebtor ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600";
 
-                                    <div className="pt-4 border-t border-gray-50 dark:border-white/5">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Balance</p>
-                                        <p className={`text-2xl font-black ${c.balance > 0 ? "text-red-500" : "text-green-600"}`}>
-                                            ${Number(c.balance || 0).toLocaleString()}
-                                        </p>
-                                    </div>
+                                return (
+                                    <Card key={c.id} className={`group border-y-0 border-l-0 border-r-[6px] ${borderColor} hover:shadow-xl transition-all`}>
+                                        <CardContent className="p-6">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 font-black text-xl shadow-sm">
+                                                    {c.name.charAt(0)}
+                                                </div>
+                                                <Badge variant="outline" className={`border-transparent ${bgBadge}`}>
+                                                    {isDebtor ? "DEBTOR" : "CLEAR"}
+                                                </Badge>
+                                            </div>
+                                            <h3 className="font-black text-slate-800 text-lg tracking-tight">{c.name}</h3>
+                                            <p className="text-xs text-slate-400 font-bold mb-4 flex items-center gap-1">
+                                                <Users size={12} /> {c.phone || "No contact info"}
+                                            </p>
 
-                                    {c.balance > 0 && (
-                                        <button
-                                            onClick={() => {
-                                                const amt = prompt(`Enter collection amount for ${c.name}:`);
-                                                if (amt) collectPayment(c.name, Number(amt));
-                                            }}
-                                            className="mt-6 w-full py-3 bg-gray-900 text-white rounded-xl text-xs font-black shadow-lg hover:bg-blue-600 transition-all opacity-0 group-hover:opacity-100"
-                                        >
-                                            COLLECT PAYMENT
-                                        </button>
-                                    )}
-                                </Card>
-                            ))}
-                            <Card className="p-6 border-2 border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-blue-400" onClick={() => setShowAddCustomer(true)}>
-                                <UserPlus className="text-gray-300 group-hover:text-blue-500 mb-2" size={32} />
-                                <p className="font-black text-gray-400 text-xs">Register Customer</p>
+                                            <div className="pt-4 border-t border-slate-100">
+                                                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Current Balance</p>
+                                                <p className={`text-2xl font-black ${isDebtor ? "text-rose-500" : "text-emerald-500"}`}>
+                                                    ${Number(c.balance || 0).toLocaleString()}
+                                                </p>
+                                            </div>
+
+                                            {isDebtor && (
+                                                <Button
+                                                    onClick={() => {
+                                                        const amt = prompt(`Enter collection amount for ${c.name}:`);
+                                                        if (amt) collectPayment(c.name, Number(amt));
+                                                    }}
+                                                    size="sm"
+                                                    className="mt-4 w-full bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 font-bold border-rose-200"
+                                                >
+                                                    COLLECT PAYMENT
+                                                </Button>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                )
+                            })}
+                            <Card
+                                className="border-2 border-dashed border-border flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all"
+                                onClick={() => setShowAddCustomer(true)}
+                            >
+                                <CardContent className="flex flex-col items-center p-6">
+                                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors mb-4">
+                                        <UserPlus size={24} />
+                                    </div>
+                                    <h3 className="font-bold text-muted-foreground group-hover:text-foreground">Register Customer</h3>
+                                    <p className="text-xs text-muted-foreground mt-2">Add new client to ledger</p>
+                                </CardContent>
                             </Card>
                         </div>
                     </div>
@@ -353,111 +430,118 @@ const SalesModule = () => {
 
                 {/* HISTORY TAB */}
                 {activeTab === "history" && (
-                    <Card className="overflow-hidden animate-fade-in shadow-xl">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead className="bg-gray-50 dark:bg-white/5">
-                                    <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/10">
-                                        <th className="p-6">Time / Date</th>
-                                        <th className="p-6">Client / Customer</th>
-                                        <th className="p-6">Activity</th>
-                                        <th className="p-6">Total Amount</th>
-                                        <th className="p-6">Payment Info</th>
-                                        <th className="p-6">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-white/10">
+                    <Card className="overflow-hidden animate-fade-in shadow-xl border-none">
+                        <div className="max-h-[600px] overflow-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Time / Date</TableHead>
+                                        <TableHead>Client / Customer</TableHead>
+                                        <TableHead>Activity</TableHead>
+                                        <TableHead>Total Amount</TableHead>
+                                        <TableHead>Payment Info</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
                                     {salesHistory.map((t) => (
-                                        <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                                            <td className="p-6 whitespace-nowrap">
+                                        <TableRow key={t.id} className="group hover:bg-muted/50">
+                                            <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <Clock size={14} className="text-gray-400" />
+                                                    <Clock size={14} className="text-muted-foreground" />
                                                     <div>
-                                                        <p className="font-bold text-gray-800 dark:text-white text-xs">{t.date}</p>
-                                                        <p className="text-[10px] text-gray-400">{t.time}</p>
+                                                        <p className="font-bold text-foreground text-xs">{t.date}</p>
+                                                        <p className="text-[10px] text-muted-foreground">{t.time}</p>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="p-6">
-                                                <p className="font-bold text-gray-800 dark:text-white">{t.client}</p>
-                                            </td>
-                                            <td className="p-6">
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-bold text-foreground">{t.client}</p>
+                                            </TableCell>
+                                            <TableCell>
                                                 {t.type === 'SELL' ? (
                                                     <div className="flex items-center gap-2">
-                                                        <ArrowDownRight size={14} className="text-red-500" />
-                                                        <span className="text-xs font-bold text-gray-500">Sale: {t.itemName} ({t.quantity})</span>
+                                                        <ArrowDownRight size={14} className="text-emerald-500" />
+                                                        <span className="text-xs font-bold text-muted-foreground">Sale: {t.itemName} ({t.quantity})</span>
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center gap-2">
-                                                        <ArrowUpRight size={14} className="text-green-500" />
-                                                        <span className="text-xs font-bold text-gray-500">Payment Collection</span>
+                                                        <ArrowUpRight size={14} className="text-primary" />
+                                                        <span className="text-xs font-bold text-muted-foreground">Payment Collection</span>
                                                     </div>
                                                 )}
-                                            </td>
-                                            <td className="p-6">
-                                                <p className="font-black text-gray-900 dark:text-white">${t.total.toLocaleString()}</p>
-                                            </td>
-                                            <td className="p-6">
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-black text-foreground">${t.total.toLocaleString()}</p>
+                                            </TableCell>
+                                            <TableCell>
                                                 {t.type === 'SELL' && (
                                                     <div className="text-[10px]">
-                                                        <p className="text-green-600 font-black">PAID: ${t.amountPaid.toLocaleString()}</p>
-                                                        <p className="text-red-500 font-bold">DUE: ${t.balanceDue.toLocaleString()}</p>
+                                                        <p className="text-emerald-600 font-bold">PAID: ${t.amountPaid.toLocaleString()}</p>
+                                                        {t.balanceDue > 0 && <p className="text-destructive font-black">DUE: ${t.balanceDue.toLocaleString()}</p>}
                                                     </div>
                                                 )}
-                                            </td>
-                                            <td className="p-6">
+                                            </TableCell>
+                                            <TableCell>
                                                 <Badge
                                                     variant={
                                                         t.status === 'PAID' ? 'success' :
                                                             t.status === 'PARTIAL' ? 'warning' :
-                                                                t.status === 'CREDIT' ? 'danger' : 'info'
+                                                                t.status === 'CREDIT' ? 'destructive' : 'default'
                                                     }
                                                 >
                                                     {t.status}
                                                 </Badge>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
                                     {salesHistory.length === 0 && (
-                                        <tr>
-                                            <td colSpan="6" className="p-12 text-center text-gray-400 italic">No sales or payments found.</td>
-                                        </tr>
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="p-12 text-center text-muted-foreground italic">No sales or payments record found.</TableCell>
+                                        </TableRow>
                                     )}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                     </Card>
                 )}
             </div>
 
-            {/* CUSTOMER MODAL (Simplified for brevity) */}
+            {/* CUSTOMER MODAL */}
             {showAddCustomer && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <Card className="max-w-md w-full p-8 animate-scale-in">
-                        <h3 className="text-2xl font-black mb-6">Register Customer</h3>
-                        <form onSubmit={handleCreateCustomer} className="space-y-4">
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase">Customer Name</label>
-                                <input
-                                    required
-                                    value={customerForm.name}
-                                    onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })}
-                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase">Phone</label>
-                                <input
-                                    value={customerForm.phone}
-                                    onChange={(e) => setCustomerForm({ ...customerForm, phone: e.target.value })}
-                                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none"
-                                />
-                            </div>
-                            <div className="flex gap-4 mt-8">
-                                <button type="button" onClick={() => setShowAddCustomer(false)} className="flex-1 py-3 text-sm font-bold text-gray-500">Cancel</button>
-                                <button type="submit" className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-black">Register</button>
-                            </div>
-                        </form>
+                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+                    <Card className="max-w-md w-full shadow-2xl border-border">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Register Customer</CardTitle>
+                            <Button variant="ghost" size="icon" onClick={() => setShowAddCustomer(false)}>
+                                <X size={18} />
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleCreateCustomer} className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase">Customer Name</label>
+                                    <Input
+                                        required
+                                        value={customerForm.name}
+                                        onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })}
+                                        placeholder="Full Name"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase">Phone</label>
+                                    <Input
+                                        value={customerForm.phone}
+                                        onChange={(e) => setCustomerForm({ ...customerForm, phone: e.target.value })}
+                                        placeholder="+1 (555) 000-0000"
+                                    />
+                                </div>
+                                <div className="flex gap-4 mt-8 pt-4">
+                                    <Button type="button" variant="ghost" onClick={() => setShowAddCustomer(false)} className="flex-1">Cancel</Button>
+                                    <Button type="submit" className="flex-1">Register Customer</Button>
+                                </div>
+                            </form>
+                        </CardContent>
                     </Card>
                 </div>
             )}

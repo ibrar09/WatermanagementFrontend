@@ -1,282 +1,298 @@
-import { useData } from "../../../context/DataContext";
 import { useNavigate } from "react-router-dom";
+import { useData } from "../../../context/DataContext";
 import {
   Droplet,
-  Wine,
-  Coffee,
-  Zap,
-  Activity,
-  ArrowRight,
   Package,
-  AlertCircle,
+  ShoppingCart,
   TrendingUp,
-  DollarSign
+  Activity,
+  AlertCircle,
+  ArrowRight,
+  Factory
 } from "lucide-react";
 
-const ProductCard = ({ title, material, capType, bestFor, keywords, inventory, icon: Icon, color }) => {
-  const navigate = useNavigate();
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "../../../components/ui/Card";
 
-  // Color Mapping for Tailwind JIT
-  const colorStyles = {
-    blue: {
-      bg: "bg-blue-50 dark:bg-blue-900/20",
-      text: "text-blue-600 dark:text-blue-300",
-      border: "hover:border-blue-400",
-      iconBg: "bg-blue-50 dark:bg-white/5",
-      hoverBg: "hover:bg-blue-50",
-      groupText: "text-blue-500"
-    },
-    cyan: {
-      bg: "bg-cyan-50 dark:bg-cyan-900/20",
-      text: "text-cyan-600 dark:text-cyan-300",
-      border: "hover:border-cyan-400",
-      iconBg: "bg-cyan-50 dark:bg-white/5",
-      hoverBg: "hover:bg-cyan-50",
-      groupText: "text-cyan-500"
-    },
-    purple: {
-      bg: "bg-purple-50 dark:bg-purple-900/20",
-      text: "text-purple-600 dark:text-purple-300",
-      border: "hover:border-purple-400",
-      iconBg: "bg-purple-50 dark:bg-white/5",
-      hoverBg: "hover:bg-purple-50",
-      groupText: "text-purple-500"
-    },
-    indigo: {
-      bg: "bg-indigo-50 dark:bg-indigo-900/20",
-      text: "text-indigo-600 dark:text-indigo-300",
-      border: "hover:border-indigo-400",
-      iconBg: "bg-indigo-50 dark:bg-white/5",
-      hoverBg: "hover:bg-indigo-50",
-      groupText: "text-indigo-500"
-    }
-  };
+import { Button } from "../../../components/ui/Button";
+import { Badge } from "../../../components/ui/Badge";
 
-  const styles = colorStyles[color] || colorStyles.blue;
-
-  // Aggregate Data based on keywords
-  const matchedItems = inventory.filter(item =>
-    keywords.some(k => item.name.toLowerCase().includes(k.toLowerCase()))
-  );
-
-  const totalStock = matchedItems.reduce((acc, curr) => acc + Number(curr.quantity), 0);
-  const avgPrice = matchedItems.length > 0
-    ? (matchedItems.reduce((acc, curr) => acc + Number(curr.sellingPrice), 0) / matchedItems.length).toFixed(2)
-    : "0.00";
-
-  // Determine Alert Status
-  const isLowStock = totalStock < 50 && totalStock > 0;
-  const isOutOfStock = totalStock === 0 && matchedItems.length > 0;
-  const isEmpty = matchedItems.length === 0;
-
-  return (
-    <div
-      onClick={() => navigate(`/product-details?category=${encodeURIComponent(title)}&keywords=${encodeURIComponent(keywords.join(','))}`)}
-      className={`relative group overflow-hidden bg-white dark:bg-white/10 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-white/10 hover:shadow-xl transition-all cursor-pointer ${styles.border}`}
-    >
-      <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${styles.groupText}`}>
-        <Icon size={120} />
-      </div>
-
-      <div className="relative z-10 flex flex-col h-full justify-between">
-        <div>
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`p-3 rounded-2xl ${styles.iconBg} ${styles.text}`}>
-              <Icon size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">{title}</h3>
-          </div>
-
-          {/* Specs */}
-          <div className="space-y-2 mb-6">
-            <div className="flex items-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              <span className="w-24">Material:</span>
-              <span className="text-gray-800 dark:text-white">{material}</span>
-            </div>
-            <div className="flex items-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              <span className="w-24">Cap Type:</span>
-              <span className="text-gray-800 dark:text-white">{capType}</span>
-            </div>
-            <div className="flex items-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              <span className="w-24">Best For:</span>
-              <span className="text-gray-800 dark:text-white truncate">{bestFor}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Data */}
-        <div className="pt-6 border-t border-gray-100 dark:border-white/10">
-          <div className="flex justify-between items-end">
-            <div>
-              <p className="text-sm text-gray-400 font-medium mb-1">In Stock</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-gray-800 dark:text-white space-grotesk">{totalStock}</span>
-                <span className="text-sm font-medium text-gray-400">units</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-400 font-medium mb-1">Avg Price</p>
-              <span className="text-xl font-bold text-gray-700 dark:text-gray-200">${avgPrice}</span>
-            </div>
-          </div>
-
-          {/* Status Badge */}
-          <div className="mt-4 flex items-center justify-between">
-            {isEmpty ? (
-              <span className="px-3 py-1 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 text-xs font-bold flex items-center gap-1">
-                <AlertCircle size={12} /> No Data
-              </span>
-            ) : isOutOfStock ? (
-              <span className="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs font-bold flex items-center gap-1">
-                <AlertCircle size={12} /> Out of Stock
-              </span>
-            ) : isLowStock ? (
-              <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-bold flex items-center gap-1">
-                <Activity size={12} /> Low Stock
-              </span>
-            ) : (
-              <span className="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs font-bold flex items-center gap-1">
-                <Package size={12} /> Healthy
-              </span>
-            )}
-
-            <button className={`p-2 rounded-full ${styles.hoverBg} ${styles.text} transition-colors`}>
-              <ArrowRight size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import {
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 
 export default function Dashboard() {
   const { inventory, getStats } = useData();
   const stats = getStats();
   const navigate = useNavigate();
 
-  const products = [
-    {
-      title: "Gallon (19L)",
-      material: "Polycarbonate",
-      capType: "Valve Cap",
-      bestFor: "Home / Office Dispensers",
-      keywords: ["19L", "Gallon", "Dispenser"],
-      icon: Droplet,
-      color: "blue"
-    },
-    {
-      title: "Personal Bottles",
-      material: "PET Plastic",
-      capType: "Screw Cap",
-      bestFor: "Travel, Gym, Daily Use",
-      keywords: ["330ml", "500ml", "1.5L", "Bottle"],
-      icon: Activity,
-      color: "cyan"
-    },
-    {
-      title: "Reflections",
-      material: "Premium Glass",
-      capType: "Metal Cap",
-      bestFor: "Restaurants, Hotels",
-      keywords: ["Glass", "Reflection", "Premium"],
-      icon: Wine, // Glass icon alternative
-      color: "purple"
-    },
-    {
-      title: "Cups (240ml)",
-      material: "PP Plastic",
-      capType: "Peel-off Foil",
-      bestFor: "Events, Offices",
-      keywords: ["Cup", "200ml", "240ml"],
-      icon: Coffee,
-      color: "indigo"
-    }
+  const salesData = [
+    { name: "Mon", original: 4000, new: 2400 },
+    { name: "Tue", original: 3000, new: 1398 },
+    { name: "Wed", original: 2000, new: 9800 },
+    { name: "Thu", original: 2780, new: 3908 },
+    { name: "Fri", original: 1890, new: 4800 },
+    { name: "Sat", original: 2390, new: 3800 },
+    { name: "Sun", original: 3490, new: 4300 },
   ];
 
-  return (
-    <div className="space-y-10 animate-fade-in max-w-7xl mx-auto">
-      {/* 2. Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h2 className="text-4xl font-black text-gray-800 dark:text-white tracking-tight">Product Portfolio</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Real-time production and inventory insight across all product lines.</p>
-        </div>
-        <div className="flex items-center gap-4 bg-white dark:bg-white/10 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10">
-          <div className="text-right">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Inventory Value</p>
-            <p className="text-2xl font-black text-green-500">${stats.stockValue.toLocaleString()}</p>
+  /* 
+     Enhanced StatCard with Right-Side Color Accent 
+     Matches "Elite" Design System
+  */
+  const StatCard = ({ title, value, subtext, icon: Icon, trend, color }) => {
+    // Map simplified color names to Tailwind classes
+    const colorMap = {
+      blue: { border: "border-r-blue-500", iconBg: "bg-blue-100", iconText: "text-blue-600", badge: "bg-blue-100 text-blue-700" },
+      emerald: { border: "border-r-emerald-500", iconBg: "bg-emerald-100", iconText: "text-emerald-600", badge: "bg-emerald-100 text-emerald-700" },
+      amber: { border: "border-r-amber-500", iconBg: "bg-amber-100", iconText: "text-amber-600", badge: "bg-amber-100 text-amber-700" },
+      cyan: { border: "border-r-cyan-500", iconBg: "bg-cyan-100", iconText: "text-cyan-600", badge: "bg-cyan-100 text-cyan-700" },
+      purple: { border: "border-r-purple-500", iconBg: "bg-purple-100", iconText: "text-purple-600", badge: "bg-purple-100 text-purple-700" },
+      rose: { border: "border-r-rose-500", iconBg: "bg-rose-100", iconText: "text-rose-600", badge: "bg-rose-100 text-rose-700" },
+    };
+
+    const styles = colorMap[color] || colorMap.blue;
+
+    return (
+      <Card className={`bg-white/90 backdrop-blur rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border-y-0 border-l-0 ${styles.border} border-r-[6px] group`}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                {title}
+              </p>
+              <h3 className="text-3xl font-black text-gray-900 mt-2 tracking-tight group-hover:scale-105 transition-transform origin-left">
+                {value}
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl ${styles.iconBg} ${styles.iconText} transition-colors`}>
+              <Icon size={28} />
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-full bg-green-50 dark:bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400">
-            <DollarSign size={24} />
-          </div>
-        </div>
-      </div>
 
-      {/* 3. Product Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {products.map((p, i) => (
-          <ProductCard key={i} {...p} inventory={inventory} />
-        ))}
-      </div>
-
-      {/* 4. Quick Actions / Raw Material Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Raw Materials Check */}
-        <div className="lg:col-span-2 bg-white dark:bg-white/10 rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-white/10">
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-            <Package className="text-blue-500" />
-            Raw Material Status
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {['Empty Bottles', 'Bottle Caps', 'Labels', 'Preforms'].map((item) => {
-              const stock = inventory.find(i => i.name.includes(item))?.quantity || 0;
-              const status = stock > 100 ? "Good" : stock > 20 ? "Low" : "Critial";
-              const statusColor = stock > 100 ? "bg-green-100 text-green-700" : stock > 20 ? "bg-orange-100 text-orange-700" : "bg-red-100 text-red-700";
-
-              return (
-                <div
-                  key={item}
-                  onClick={() => navigate(`/product-details?category=Raw%20Materials&keywords=${item}`)}
-                  className="cursor-pointer p-4 rounded-2xl bg-gray-50 dark:bg-black/20 border border-gray-100 dark:border-white/5 flex justify-between items-center group hover:bg-white dark:hover:bg-white/10 transition-colors shadow-sm hover:shadow"
-                >
-                  <div>
-                    <p className="text-sm font-bold text-gray-500 dark:text-gray-400">{item}</p>
-                    <p className="text-2xl font-black text-gray-800 dark:text-white mt-1">{stock}</p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold ${statusColor}`}>
-                    {status}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Quick Profit Stat */}
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-8 shadow-xl text-white relative overflow-hidden">
-          <div className="relative z-10">
-            <p className="text-indigo-100 font-bold mb-1 flex items-center gap-2">
-              <TrendingUp size={18} /> Net Profit (Real-Time)
-            </p>
-            <h3 className="text-5xl font-black tracking-tight mb-2">${stats.profit.toLocaleString()}</h3>
-            <p className="text-indigo-200 text-sm">Based on {stats.totalOrders} transactions</p>
-
-            <button
-              onClick={() => navigate('/reports')}
-              className="mt-8 w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-bold transition-all border border-white/30"
+          <div className="mt-4 flex items-center gap-3">
+            <Badge
+              variant="outline"
+              className={`rounded-md border-none px-2 font-bold ${trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}
             >
-              View Financial Report
-            </button>
+              {trend === "up" ? "+" : "-"}
+              {Math.floor(Math.random() * 12) + 2}%
+            </Badge>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              {subtext}
+            </span>
           </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
-          {/* Decor */}
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-10 -left-10 w-40 h-40 bg-purple-500/30 rounded-full blur-3xl"></div>
+  return (
+    <div className="space-y-10">
+      {/* PAGE HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Real-time overview of your water plant operations
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => navigate("/reports")}>
+            View Reports
+          </Button>
+          <Button onClick={() => navigate("/sales")}>
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            New Sale
+          </Button>
         </div>
       </div>
 
+      {/* KPI CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Inventory Value"
+          value={`$${stats.stockValue.toLocaleString()}`}
+          subtext="vs last month"
+          icon={Package}
+          trend="up"
+          color="blue"
+        />
+        <StatCard
+          title="Total Profit"
+          value={`$${stats.profit.toLocaleString()}`}
+          subtext="Net earnings"
+          icon={TrendingUp}
+          trend="up"
+          color="emerald"
+        />
+        <StatCard
+          title="Orders Today"
+          value={stats.totalOrders}
+          subtext="Transactions"
+          icon={ShoppingCart}
+          trend="up"
+          color="amber"
+        />
+        <StatCard
+          title="Plant Efficiency"
+          value="94%"
+          subtext="Uptime"
+          icon={Factory}
+          trend="down"
+          color="purple"
+        />
+      </div>
+
+      {/* LIVE PRODUCTION FLOW */}
+      <Card className="bg-slate-900 border-none shadow-2xl relative overflow-hidden group">
+        {/* Animated Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 opacity-80" />
+
+        <CardHeader className="relative z-10 flex flex-row items-center justify-between border-b border-white/10 pb-4">
+          <div>
+            <CardTitle className="flex items-center gap-3 text-white">
+              <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400 animate-pulse">
+                <Activity size={24} />
+              </div>
+              Live Production Telemetry
+            </CardTitle>
+            <CardDescription className="text-slate-400 mt-1 pl-1">
+              Real-time filtration pressure & output flow monitoring
+            </CardDescription>
+          </div>
+          <div className="flex gap-4">
+            <div className="text-right">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Status</p>
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-none animate-pulse">OPERATIONAL</Badge>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Current Output</p>
+              <p className="text-xl font-mono font-black text-white">1,240 <span className="text-xs text-slate-500">BPH</span></p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="relative z-10 h-[280px] w-full pt-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={[
+              { time: '10:00', pressure: 65, flow: 40 }, { time: '10:05', pressure: 70, flow: 45 },
+              { time: '10:10', pressure: 68, flow: 55 }, { time: '10:15', pressure: 72, flow: 60 },
+              { time: '10:20', pressure: 75, flow: 58 }, { time: '10:25', pressure: 80, flow: 65 },
+              { time: '10:30', pressure: 78, flow: 70 }, { time: '10:35', pressure: 82, flow: 75 },
+              { time: '10:40', pressure: 79, flow: 72 }, { time: '10:45', pressure: 85, flow: 80 },
+              { time: '10:50', pressure: 88, flow: 85 }, { time: '10:55', pressure: 90, flow: 82 },
+            ]}>
+              <defs>
+                <linearGradient id="colorFlow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.5} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorPressure" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.5} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Tooltip
+                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
+                itemStyle={{ color: '#e2e8f0', fontSize: '12px', fontWeight: 'bold' }}
+                labelStyle={{ color: '#94a3b8', fontSize: '10px' }}
+              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+              <Area type="monotone" dataKey="flow" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorFlow)" animationDuration={3000} />
+              <Area type="monotone" dataKey="pressure" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorPressure)" animationDuration={3000} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* CHART + ALERTS */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* SALES CHART */}
+        <Card className="lg:col-span-2 border-none shadow-lg rounded-2xl">
+          <CardHeader>
+            <CardTitle>Sales Analysis</CardTitle>
+            <CardDescription>
+              Weekly revenue comparison
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={salesData}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                <YAxis tickFormatter={(v) => `$${v}`} tickLine={false} axisLine={false} />
+                <Tooltip />
+                <Bar dataKey="original" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="new" fill="#22c55e" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* LOW STOCK */}
+        <Card className="border-none shadow-lg rounded-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <AlertCircle /> Critical Stock
+            </CardTitle>
+            <CardDescription>
+              Immediate attention required
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            {inventory
+              .filter(i => Number(i.quantity) < 200)
+              .slice(0, 5)
+              .map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-3 rounded-xl bg-red-50 hover:bg-red-100 transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white p-2 rounded-full shadow">
+                      <Droplet size={16} className="text-red-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold">{item.name}</p>
+                      <p className="text-xs text-red-600">
+                        {item.quantity} units left
+                      </p>
+                    </div>
+                  </div>
+                  <Button size="icon" variant="ghost">
+                    <ArrowRight size={14} />
+                  </Button>
+                </div>
+              ))}
+
+            {inventory.every(i => Number(i.quantity) >= 200) && (
+              <div className="text-center py-6 text-muted-foreground">
+                <Package className="mx-auto mb-2 opacity-50" size={32} />
+                All stock levels healthy
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
