@@ -189,7 +189,7 @@ export default function Dashboard() {
           </div>
         </CardHeader>
 
-        <CardContent className="relative z-10 h-[280px] w-full pt-6">
+        <CardContent className="relative z-10 h-[280px] min-h-[280px] w-full pt-6 block">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={[
               { time: '10:00', pressure: 65, flow: 40 }, { time: '10:05', pressure: 70, flow: 45 },
@@ -233,7 +233,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="h-[320px]">
+          <CardContent className="h-[320px] min-h-[320px] w-full block">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={salesData}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />

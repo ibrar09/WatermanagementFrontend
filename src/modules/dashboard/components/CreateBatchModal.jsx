@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from "react";
-import { X, Plus, Trash2, Fuel, Zap, Factory, CheckCircle2 } from "lucide-react";
+import { X, Plus, Trash2, Fuel, Zap, Factory, CheckCircle2, Package, AlertTriangle } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { Card, CardContent } from "../../../components/ui/Card";
+import { useData } from "../../../context/DataContext";
 
 const CreateBatchModal = ({ onClose }) => {
+    const { inventory, recordProduction } = useData();
+
     const [form, setForm] = useState({
         batchId: `B-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
         productName: "500ml PET Bottles",
@@ -15,22 +18,58 @@ const CreateBatchModal = ({ onClose }) => {
         unitCost: "",
     });
 
+    const [rawMaterials, setRawMaterials] = useState([{ id: 1, name: "", quantity: "" }]);
     const [wastes, setWastes] = useState([{ id: 1, type: "Caps", quantity: "" }]);
+
+    // Filter for raw materials from inventory
+    const inventoryRawMaterials = useMemo(() =>
+        inventory.filter(i => i.category === "Raw Material" || i.category === "Packaging"),
+        [inventory]);
 
     /* -------- Calculations -------- */
     const totals = useMemo(() => {
         const labor = (+form.laborCount || 0) * (+form.laborCost || 0);
         const electricity = (+form.units || 0) * (+form.unitCost || 0);
-        const total = labor + electricity;
+
+        // Calculate Raw Material Cost
+        const materialCost = rawMaterials.reduce((acc, mat) => {
+            const stockItem = inventory.find(i => i.name === mat.name);
+            const unitCost = stockItem ? Number(stockItem.costPrice) : 0;
+            return acc + (Number(mat.quantity) * unitCost);
+        }, 0);
+
+        const total = labor + electricity + materialCost;
         const perBottle = form.targetQuantity > 0 ? (total / form.targetQuantity).toFixed(2) : "0.00";
-        return { labor, electricity, total, perBottle };
-    }, [form]);
+        return { labor, electricity, materialCost, total, perBottle };
+    }, [form, rawMaterials, inventory]);
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+    // Raw Material Handlers
+    const addMaterial = () => setRawMaterials([...rawMaterials, { id: Date.now(), name: "", quantity: "" }]);
+    const updateMaterial = (id, key, value) => setRawMaterials(rawMaterials.map(m => m.id === id ? { ...m, [key]: value } : m));
+    const removeMaterial = (id) => setRawMaterials(rawMaterials.filter(m => m.id !== id));
 
     const addWaste = () => setWastes([...wastes, { id: Date.now(), type: "Labels", quantity: "" }]);
     const updateWaste = (id, key, value) => setWastes(wastes.map(w => w.id === id ? { ...w, [key]: value } : w));
     const removeWaste = (id) => setWastes(wastes.filter(w => w.id !== id));
+
+    const handleStartBatch = () => {
+        if (!form.productName || !form.targetQuantity) return alert("Please fill detailed batch info");
+
+        const success = recordProduction({
+            outputItem: { name: form.productName, quantity: Number(form.targetQuantity) },
+            usedMaterials: rawMaterials,
+            wasteItems: wastes.map(w => ({ name: w.type, quantity: w.quantity })),
+            laborCost: totals.labor,
+            overheadCost: totals.electricity
+        });
+
+        if (success) {
+            alert("Batch Production Started & Inventory Updated!");
+            onClose();
+        }
+    };
 
     return (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
@@ -61,17 +100,20 @@ const CreateBatchModal = ({ onClose }) => {
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-slate-500 ml-1">Product Type</label>
                                 <div className="relative">
-                                    <select
+                                    <Input
+                                        list="products-list"
                                         name="productName"
                                         value={form.productName}
                                         onChange={handleChange}
-                                        className="w-full h-12 px-4 bg-white border border-input rounded-xl font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-blue-500 appearance-none"
-                                    >
+                                        className="bg-white font-bold text-slate-700"
+                                        placeholder="Select or Enter Product"
+                                    />
+                                    <datalist id="products-list">
                                         <option>500ml PET Bottles</option>
                                         <option>1.5L PET Bottles</option>
-                                        <option>19L Gallon</option>
+                                        <option>19L Gallon Refill</option>
                                         <option>Premium Glass 750ml</option>
-                                    </select>
+                                    </datalist>
                                 </div>
                             </div>
                             <div className="space-y-1.5">
@@ -88,7 +130,60 @@ const CreateBatchModal = ({ onClose }) => {
                         </div>
                     </div>
 
-                    {/* SECTION 2: COSTS & UTILITIES */}
+                    {/* SECTION 2: RAW MATERIALS (NEW) */}
+                    <div className="border border-slate-100 rounded-2xl p-6 shadow-sm">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Package size={14} /> Raw Materials
+                            </h3>
+                            <Button size="sm" variant="ghost" onClick={addMaterial} className="text-indigo-600 hover:bg-indigo-50 h-8 text-xs font-bold">
+                                + Add Material
+                            </Button>
+                        </div>
+                        <div className="space-y-3">
+                            {rawMaterials.map((mat) => {
+                                const stockItem = inventory.find(i => i.name === mat.name);
+                                const isLowStock = stockItem && stockItem.quantity < Number(mat.quantity);
+
+                                return (
+                                    <div key={mat.id} className="flex flex-col md:flex-row gap-3 items-start md:items-center bg-slate-50/50 p-2 rounded-xl">
+                                        <div className="flex-1 w-full relative">
+                                            <Input
+                                                list="raw-materials-list"
+                                                placeholder="Select Material..."
+                                                value={mat.name}
+                                                onChange={(e) => updateMaterial(mat.id, "name", e.target.value)}
+                                                className="bg-white"
+                                            />
+                                            {stockItem && (
+                                                <div className={`text-[10px] mt-1 font-bold flex items-center gap-1 ${isLowStock ? "text-rose-500" : "text-emerald-500"}`}>
+                                                    {isLowStock ? <AlertTriangle size={10} /> : <CheckCircle2 size={10} />}
+                                                    Available: {stockItem.quantity} {stockItem.unit}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="w-full md:w-32">
+                                            <Input
+                                                type="number"
+                                                placeholder="Qty"
+                                                value={mat.quantity}
+                                                onChange={(e) => updateMaterial(mat.id, "quantity", e.target.value)}
+                                                className="bg-white"
+                                            />
+                                        </div>
+                                        <button onClick={() => removeMaterial(mat.id)} className="p-2 text-slate-400 hover:text-rose-500 transition-colors">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <datalist id="raw-materials-list">
+                            {inventoryRawMaterials.map(i => <option key={i.id} value={i.name} />)}
+                        </datalist>
+                    </div>
+
+                    {/* SECTION 3: COSTS & UTILITIES */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* LABOR */}
                         <div className="border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -157,7 +252,7 @@ const CreateBatchModal = ({ onClose }) => {
                         </div>
                     </div>
 
-                    {/* SECTION 3: WASTE LOGGING */}
+                    {/* SECTION 4: WASTE LOGGING */}
                     <div className="border border-slate-100 rounded-2xl p-6">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -201,11 +296,18 @@ const CreateBatchModal = ({ onClose }) => {
                         <div className="text-left">
                             <p className="text-xs font-bold text-slate-400 uppercase">Estimated Production Cost</p>
                             <p className="text-3xl font-black text-slate-900">${totals.total.toLocaleString()}</p>
-                            <p className="text-xs font-medium text-slate-500">~ ${totals.perBottle} / unit</p>
+                            <div className="flex gap-4 text-xs font-medium text-slate-500">
+                                <span>~ ${totals.perBottle} / unit</span>
+                                <span className="text-blue-500">Materials: ${totals.materialCost.toLocaleString()}</span>
+                            </div>
                         </div>
                         <div className="flex gap-4">
                             <Button variant="ghost" size="lg" onClick={onClose} className="font-bold text-slate-500">Cancel</Button>
-                            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 font-black uppercase tracking-wider px-8">
+                            <Button
+                                size="lg"
+                                onClick={handleStartBatch}
+                                className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 font-black uppercase tracking-wider px-8"
+                            >
                                 Confirm & Start Batch
                             </Button>
                         </div>

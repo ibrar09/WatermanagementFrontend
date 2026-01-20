@@ -18,6 +18,7 @@ const SalesModule = () => {
     const [activeTab, setActiveTab] = useState("new-sale");
 
     // New Sale State
+    const [saleType, setSaleType] = useState("NEW"); // NEW or EXCHANGE
     const [saleForm, setSaleForm] = useState({
         itemName: "",
         quantity: "",
@@ -61,7 +62,8 @@ const SalesModule = () => {
             quantity: Number(saleForm.quantity),
             sellingPrice: Number(saleForm.sellingPrice || (selectedItem ? selectedItem.sellingPrice : 0)),
             client: saleForm.clientName,
-            amountPaid: Number(saleForm.amountPaid || 0)
+            amountPaid: Number(saleForm.amountPaid || 0),
+            saleType: saleType // Pass the selected type
         });
 
         if (success) {
@@ -157,6 +159,30 @@ const SalesModule = () => {
                             </CardHeader>
                             <CardContent className="pt-8">
                                 <form onSubmit={handleProcessSale} className="space-y-8">
+
+                                    {/* SECTION 0: TYPE */}
+                                    <div className="bg-slate-50 p-1 rounded-xl flex">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSaleType("NEW")}
+                                            className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${saleType === "NEW"
+                                                    ? "bg-white text-blue-600 shadow-md transform scale-[1.02]"
+                                                    : "text-slate-400 hover:text-slate-600"
+                                                }`}
+                                        >
+                                            New Bottle
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSaleType("EXCHANGE")}
+                                            className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider rounded-lg transition-all ${saleType === "EXCHANGE"
+                                                    ? "bg-white text-emerald-600 shadow-md transform scale-[1.02]"
+                                                    : "text-slate-400 hover:text-slate-600"
+                                                }`}
+                                        >
+                                            Exchange / Reuse
+                                        </button>
+                                    </div>
 
                                     {/* SECTION 1: CUSTOMER */}
                                     <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">

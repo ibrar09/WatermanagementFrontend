@@ -13,6 +13,9 @@ import {
   Layers,
   FileText,
   Gauge,
+  Factory,
+  ShoppingCart,
+  ShoppingBag,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -21,10 +24,11 @@ export default function Sidebar() {
   const menuItems = [
     { name: "Overview", icon: LayoutDashboard, path: "/" },
     { name: "My Inventory", icon: Layers, path: "/inventory" },
-    { name: "Purchase", icon: ChevronRight, path: "/purchase" },
-    { name: "Sales (Out)", icon: ChevronLeft, path: "/sales" },
+    { name: "Production", icon: Factory, path: "/production" },
+    { name: "Sales Point", icon: ShoppingCart, path: "/sales" },
+    { name: "Customers", icon: Users, path: "/customers" },
+    { name: "Purchase", icon: ShoppingBag, path: "/purchase" },
     { name: "Analytics", icon: BarChart2, path: "/reports" },
-    { name: "Production", icon: Users, path: "/production" },
     { name: "Utilities", icon: Gauge, path: "/utilities" },
     { name: "Settings", icon: Settings, path: "/settings" },
   ];

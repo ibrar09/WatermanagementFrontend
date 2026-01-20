@@ -220,16 +220,15 @@ export const DataProvider = ({ children }) => {
         setInventory(prev => prev.filter(item => item.id !== id));
     };
 
-    const sellStock = (saleItem) => {
-        const availableItem = inventory.find(i => i.name === saleItem.name);
-        if (!availableItem || availableItem.quantity < saleItem.quantity) {
+    const sellStock = ({ name, quantity, sellingPrice, client, amountPaid, saleType = "NEW" }) => {
+        const availableItem = inventory.find(i => i.name === name);
+        if (!availableItem || availableItem.quantity < quantity) {
             alert("Insufficient Stock!");
             return false;
         }
 
-        const total = Number(saleItem.quantity) * Number(saleItem.sellingPrice);
-        const amountPaid = Number(saleItem.amountPaid || 0);
-        const balanceDue = total - amountPaid;
+        const total = Number(quantity) * Number(sellingPrice);
+        const balanceDue = total - Number(amountPaid || 0);
 
         let status = "PAID";
         if (amountPaid === 0) status = "CREDIT";
@@ -238,30 +237,49 @@ export const DataProvider = ({ children }) => {
         const transaction = {
             id: Date.now(),
             type: "SELL",
-            client: saleItem.client || "Walk-in",
-            itemName: saleItem.name,
-            quantity: Number(saleItem.quantity),
+            saleType: saleType, // NEW or EXCHANGE
+            client: client || "Walk-in",
+            itemName: name,
+            quantity: Number(quantity),
             total: total,
-            amountPaid: amountPaid,
+            amountPaid: Number(amountPaid || 0),
             balanceDue: balanceDue,
             status: status,
-            profit: (Number(saleItem.sellingPrice) - Number(availableItem.costPrice)) * Number(saleItem.quantity),
+            profit: (Number(sellingPrice) - Number(availableItem.costPrice)) * Number(quantity),
             date: new Date().toISOString().split('T')[0],
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
         setTransactions(prev => [transaction, ...prev]);
 
+        // Deduct Sold Stock
         setInventory(prev =>
             prev.map(item =>
-                item.name === saleItem.name
-                    ? { ...item, quantity: item.quantity - saleItem.quantity }
+                item.name === name
+                    ? { ...item, quantity: item.quantity - quantity }
                     : item
             )
         );
 
-        if (balanceDue > 0 && saleItem.client !== "Walk-in") {
-            updateCustomerBalance(saleItem.client, balanceDue);
+        // LOGIC FOR EXCHANGE: RESTOCK EMPTY BOTTLES
+        // If selling "Mineral Water (19L)" in EXCHANGE mode, we get back "Empty 19L Bottle"
+        if (saleType === "EXCHANGE" && name.includes("19L")) {
+             setInventory(prev => {
+                const emptyBottle = prev.find(i => i.name.includes("Empty") && i.name.includes("19L"));
+                if (emptyBottle) {
+                    return prev.map(item => 
+                        item.id === emptyBottle.id 
+                        ? { ...item, quantity: item.quantity + Number(quantity) }
+                        : item
+                    );
+                }
+                // If empty bottle item doesn't exist, we could create it, but for now we assume it exists from Purchase
+                return prev;
+             });
+        }
+
+        if (balanceDue > 0 && client !== "Walk-in") {
+            updateCustomerBalance(client, balanceDue);
         }
 
         return true;

@@ -5,6 +5,7 @@ import Inventory from "./modules/dashboard/pages/Inventory";
 import Production from "./modules/dashboard/pages/Production";
 import PurchaseForm from "./modules/dashboard/pages/PurchaseForm";
 import SalesModule from "./modules/dashboard/pages/SalesModule";
+import Customers from "./modules/dashboard/pages/Customers"; // Import
 import Reports from "./modules/dashboard/pages/Reports";
 import ProductDetails from "./modules/dashboard/pages/ProductDetails";
 import UtilitiesAndConsumables from "./modules/dashboard/pages/UtilitiesAndConsumables";
@@ -55,6 +56,14 @@ export default function App() {
               element={
                 <DashboardLayout>
                   <SalesModule />
+                </DashboardLayout>
+              }
+            />
+            <Route
+              path="/customers"
+              element={
+                <DashboardLayout>
+                  <Customers />
                 </DashboardLayout>
               }
             />

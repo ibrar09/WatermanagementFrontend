@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useData } from "../../../context/DataContext";
 import { Badge } from "../../../components/ui/Badge";
 import {
   Search, Plus, Filter, Package, ChevronDown, AlertCircle,
@@ -13,27 +14,22 @@ import {
  */
 const Inventory = () => {
   // Mocking the context for the sake of a runnable demo
-  const [inventory, setInventory] = useState([
-    { id: '1', name: "Industrial Grade Steel Pipe", category: "Construction", quantity: 15, unit: "Units", costPrice: 450.00, sellingPrice: 620.00 },
-    { id: '2', name: "Copper Wiring (Roll)", category: "Electronics", quantity: 85, unit: "Rolls", costPrice: 120.50, sellingPrice: 185.00 },
-    { id: '3', name: "Safety Helmets - Onyx Edition", category: "Safety", quantity: 42, unit: "Units", costPrice: 25.00, sellingPrice: 55.00 },
-    { id: '4', name: "Heavy Duty Forklift Battery", category: "Machinery", quantity: 8, unit: "Units", costPrice: 1200.00, sellingPrice: 1550.00 },
-  ]);
+  const { inventory, addStock } = useData();
 
   const [isFormMode, setIsFormMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [viewMode, setViewMode] = useState("grid"); // grid or list
 
-  const categories = ["All", "Construction", "Electronics", "Safety", "Machinery", "Chemicals"];
+  const categories = ["All", "Construction", "Electronics", "Safety", "Machinery", "Chemicals", "Finished Goods", "Raw Material", "Packaging"];
 
   // Form State
   const [formData, setFormData] = useState({
-    name: "", category: "Construction", quantity: "", unit: "Units", costPrice: "", sellingPrice: ""
+    name: "", category: "Raw Material", quantity: "", unit: "Units", costPrice: "", sellingPrice: ""
   });
 
   const stats = {
-    stockValue: inventory.reduce((acc, item) => acc + (item.quantity * item.costPrice), 0),
+    stockValue: inventory.reduce((acc, item) => acc + (Number(item.quantity) * Number(item.costPrice)), 0),
     lowStockCount: inventory.filter(i => i.quantity < 20).length,
     totalSkus: inventory.length
   };
@@ -50,14 +46,13 @@ const Inventory = () => {
     e.preventDefault();
     const newItem = {
       ...formData,
-      id: Math.random().toString(36).substr(2, 9),
       quantity: Number(formData.quantity),
       costPrice: Number(formData.costPrice),
       sellingPrice: Number(formData.sellingPrice || 0)
     };
-    setInventory([...inventory, newItem]);
+    addStock(newItem); // Use Context Action
     setIsFormMode(false);
-    setFormData({ name: "", category: "Construction", quantity: "", unit: "Units", costPrice: "", sellingPrice: "" });
+    setFormData({ name: "", category: "Raw Material", quantity: "", unit: "Units", costPrice: "", sellingPrice: "" });
   };
 
   // Render Form Modal
