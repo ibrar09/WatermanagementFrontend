@@ -12,6 +12,108 @@ import {
  * MOCK DATA CONTEXT REPLACEMENT
  * In a real app, these would come from your useData() hook.
  */
+const RenderForm = ({ formData, setFormData, handleSubmit, setIsFormMode, categories }) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-md bg-white/40">
+    <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">Add New Asset</h2>
+          <p className="text-xs text-slate-500 font-medium">Enter product details for the secure registry</p>
+        </div>
+        <button onClick={() => setIsFormMode(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+          <X size={20} className="text-slate-400" />
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-8 space-y-5">
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Asset Name</label>
+          <input
+            required
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-slate-700"
+            placeholder="e.g. Titanium Fasteners"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Category</label>
+            <select
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-slate-700 appearance-none"
+              value={formData.category}
+              onChange={e => setFormData({ ...formData, category: e.target.value })}
+            >
+              {categories.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unit of Measure</label>
+            <select
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
+              value={formData.unit}
+              onChange={e => setFormData({ ...formData, unit: e.target.value })}
+            >
+              <option>Units</option>
+              <option>Rolls</option>
+              <option>kg</option>
+              <option>Liters</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Stock</label>
+            <input
+              type="number" required
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
+              value={formData.quantity}
+              onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cost ($)</label>
+            <input
+              type="number" required step="0.01"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
+              value={formData.costPrice}
+              onChange={e => setFormData({ ...formData, costPrice: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Retail ($)</label>
+            <input
+              type="number" step="0.01"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
+              value={formData.sellingPrice}
+              onChange={e => setFormData({ ...formData, sellingPrice: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="pt-4 flex gap-3">
+          <button
+            type="button"
+            onClick={() => setIsFormMode(false)}
+            className="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="flex-1 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+          >
+            <Check size={18} />
+            Save to Registry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+);
+
 const Inventory = () => {
   // Mocking the context for the sake of a runnable demo
   const { inventory, addStock } = useData();
@@ -55,112 +157,17 @@ const Inventory = () => {
     setFormData({ name: "", category: "Raw Material", quantity: "", unit: "Units", costPrice: "", sellingPrice: "" });
   };
 
-  // Render Form Modal
-  const RenderForm = () => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-md bg-white/40">
-      <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">Add New Asset</h2>
-            <p className="text-xs text-slate-500 font-medium">Enter product details for the secure registry</p>
-          </div>
-          <button onClick={() => setIsFormMode(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <X size={20} className="text-slate-400" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-8 space-y-5">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Asset Name</label>
-            <input
-              required
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-slate-700"
-              placeholder="e.g. Titanium Fasteners"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Category</label>
-              <select
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-slate-700 appearance-none"
-                value={formData.category}
-                onChange={e => setFormData({ ...formData, category: e.target.value })}
-              >
-                {categories.filter(c => c !== "All").map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unit of Measure</label>
-              <select
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
-                value={formData.unit}
-                onChange={e => setFormData({ ...formData, unit: e.target.value })}
-              >
-                <option>Units</option>
-                <option>Rolls</option>
-                <option>kg</option>
-                <option>Liters</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Stock</label>
-              <input
-                type="number" required
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
-                value={formData.quantity}
-                onChange={e => setFormData({ ...formData, quantity: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cost ($)</label>
-              <input
-                type="number" required step="0.01"
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
-                value={formData.costPrice}
-                onChange={e => setFormData({ ...formData, costPrice: e.target.value })}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Retail ($)</label>
-              <input
-                type="number" step="0.01"
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none font-medium text-slate-700"
-                value={formData.sellingPrice}
-                onChange={e => setFormData({ ...formData, sellingPrice: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="pt-4 flex gap-3">
-            <button
-              type="button"
-              onClick={() => setIsFormMode(false)}
-              className="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-            >
-              <Check size={18} />
-              Save to Registry
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700">
-      {isFormMode && <RenderForm />}
+      {isFormMode && (
+        <RenderForm
+          formData={formData}
+          setFormData={setFormData}
+          handleSubmit={handleSubmit}
+          setIsFormMode={setIsFormMode}
+          categories={categories}
+        />
+      )}
 
       <div className="max-w-[1400px] mx-auto px-6 py-8 lg:px-10 lg:py-12 space-y-10">
 
@@ -393,7 +400,7 @@ const Inventory = () => {
       {/* Decorative Blur Elements */}
       <div className="fixed top-0 left-1/4 w-96 h-96 bg-indigo-200/20 blur-[120px] rounded-full -z-10"></div>
       <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-emerald-200/10 blur-[120px] rounded-full -z-10"></div>
-    </div>
+    </div >
   );
 };
 
