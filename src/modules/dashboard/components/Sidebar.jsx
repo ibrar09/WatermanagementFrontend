@@ -28,17 +28,16 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: "Overview", icon: LayoutDashboard, path: "/" },
+    { name: "Analytics", icon: BarChart2, path: "/reports" },
+    { name: "Purchase", icon: ShoppingBag, path: "/purchase" },
     { name: "My Inventory", icon: Layers, path: "/inventory" },
     { name: "Production", icon: Factory, path: "/production" },
-    { name: "Gate Pass / Dispatch", icon: Truck, path: "/gate-pass" },
     { name: "Sales Point", icon: ShoppingCart, path: "/sales" },
-
     { name: "Customers", icon: Users, path: "/customers" },
+    { name: "Gate Pass / Dispatch", icon: Truck, path: "/gate-pass" },
     { name: "Expenses", icon: TrendingDown, path: "/expenses" },
     { name: "HR / Staff", icon: Briefcase, path: "/hr" },
-    { name: "Purchase", icon: ShoppingBag, path: "/purchase" },
     { name: "Daily Report (DFR)", icon: ClipboardList, path: "/daily-report" },
-    { name: "Analytics", icon: BarChart2, path: "/reports" },
     { name: "Utilities", icon: Gauge, path: "/utilities" },
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
