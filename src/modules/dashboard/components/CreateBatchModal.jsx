@@ -72,16 +72,16 @@ const CreateBatchModal = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-            <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-none bg-white ring-1 ring-slate-200">
-                <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-100 p-6 flex justify-between items-center">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in">
+            <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-none bg-[#F9F7F1] ring-1 ring-slate-200">
+                <div className="sticky top-0 z-10 bg-[#3A4D4E] border-b border-[#2C3E3F] p-6 flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                            <Factory className="text-blue-600" /> Start Production Batch
+                        <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                            <Factory className="text-[#F0B100]" /> Start Production Batch
                         </h2>
-                        <p className="text-slate-500 text-sm font-medium">Configure parameters for new manufacturing run.</p>
+                        <p className="text-slate-300 text-sm font-medium">Configure parameters for new manufacturing run.</p>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-slate-100">
+                    <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-white hover:bg-white/10">
                         <X size={24} />
                     </Button>
                 </div>
@@ -306,7 +306,7 @@ const CreateBatchModal = ({ onClose }) => {
                             <Button
                                 size="lg"
                                 onClick={handleStartBatch}
-                                className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-200 font-black uppercase tracking-wider px-8"
+                                className="bg-[#F0B100] hover:bg-[#D49B00] text-slate-900 shadow-xl shadow-yellow-200/50 font-black uppercase tracking-wider px-8"
                             >
                                 Confirm & Start Batch
                             </Button>

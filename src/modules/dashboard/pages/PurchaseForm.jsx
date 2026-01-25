@@ -168,13 +168,13 @@ const PurchaseForm = () => {
                                             {items.map(item => (
                                                 <div key={item.id} className="flex justify-between text-sm">
                                                     <span>{item.name || "Untitled Item"} (x{item.quantity})</span>
-                                                    <span className="font-mono font-bold">${(item.quantity * item.cost).toFixed(2)}</span>
+                                                    <span className="font-mono font-bold">Rs. {(item.quantity * item.cost).toLocaleString()}</span>
                                                 </div>
                                             ))}
                                         </div>
                                         <div className="flex justify-between mt-6 pt-4 border-t border-slate-300">
                                             <span className="text-lg font-black text-slate-900">Total</span>
-                                            <span className="text-lg font-black text-emerald-600">${calculateTotal().toFixed(2)}</span>
+                                            <span className="text-lg font-black text-emerald-600">Rs. {calculateTotal().toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </div>

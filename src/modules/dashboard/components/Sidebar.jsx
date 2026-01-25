@@ -15,7 +15,12 @@ import {
   Gauge,
   Factory,
   ShoppingCart,
+
   ShoppingBag,
+  TrendingDown,
+  Briefcase,
+  ClipboardList,
+  Truck
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -25,9 +30,14 @@ export default function Sidebar() {
     { name: "Overview", icon: LayoutDashboard, path: "/" },
     { name: "My Inventory", icon: Layers, path: "/inventory" },
     { name: "Production", icon: Factory, path: "/production" },
+    { name: "Gate Pass / Dispatch", icon: Truck, path: "/gate-pass" },
     { name: "Sales Point", icon: ShoppingCart, path: "/sales" },
+
     { name: "Customers", icon: Users, path: "/customers" },
+    { name: "Expenses", icon: TrendingDown, path: "/expenses" },
+    { name: "HR / Staff", icon: Briefcase, path: "/hr" },
     { name: "Purchase", icon: ShoppingBag, path: "/purchase" },
+    { name: "Daily Report (DFR)", icon: ClipboardList, path: "/daily-report" },
     { name: "Analytics", icon: BarChart2, path: "/reports" },
     { name: "Utilities", icon: Gauge, path: "/utilities" },
     { name: "Settings", icon: Settings, path: "/settings" },
@@ -35,35 +45,35 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`relative h-screen bg-white shadow-xl transition-all duration-300 z-40 flex flex-col border-r border-gray-100/50
-        ${isCollapsed ? "w-20" : "w-72"}`}
+      className={`relative h-screen bg-[#3A4D4E] shadow-xl transition-all duration-300 z-40 flex flex-col border-r border-[#2C3E3F]
+        ${isCollapsed ? "w-16" : "w-56"}`}
     >
       {/* Collapse Toggle */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-8 z-50 bg-indigo-600 text-white rounded-full p-1.5 shadow-lg ring-4 ring-gray-50 hover:bg-indigo-700 transition"
+        className="absolute -right-3 top-8 z-50 bg-[#3A4D4E] text-white rounded-full p-1.5 shadow-lg border border-[#2C3E3F] hover:bg-[#2C3E3F] transition"
       >
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
       {/* Brand Logo */}
-      <div className={`h-24 flex items-center px-6 ${isCollapsed ? 'justify-center' : ''}`}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-200">
+      <div className={`h-16 flex items-center px-4 ${isCollapsed ? 'justify-center' : ''}`}>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-base shadow-lg border border-white/10">
             W
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-gray-800 leading-tight">WaterSys</span>
-              <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Logistics</span>
+              <span className="text-base font-bold text-[#F0B100] leading-tight">WaterSys</span>
+              <span className="text-[9px] uppercase font-bold text-[#8FA5A6] tracking-wider">Logistics</span>
             </div>
           )}
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
-        <p className={`px-4 text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ${isCollapsed ? 'hidden' : 'block'}`}>
+      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+        <p className={`px-3 text-[10px] font-bold text-[#8FA5A6] uppercase tracking-widest mb-2 ${isCollapsed ? 'hidden' : 'block'}`}>
           Main Menu
         </p>
         {menuItems.map((item) => (
@@ -71,18 +81,18 @@ export default function Sidebar() {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
+              `w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all duration-200 group
               ${isActive
-                ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 font-bold shadow-sm"
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                ? "bg-white/10 text-[#F0B100] font-semibold shadow-sm border border-white/5"
+                : "text-[#B0C4C5] hover:bg-white/5 hover:text-[#F0B100]"}
               ${isCollapsed ? "justify-center" : ""}`
             }
           >
             {({ isActive }) => (
               <>
-                <item.icon size={22} className={`${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`} />
-                {!isCollapsed && <span>{item.name}</span>}
-                {!isCollapsed && isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600"></div>}
+                <item.icon size={18} className={`flex-shrink-0 ${isActive ? "text-[#F0B100]" : "text-[#B0C4C5] group-hover:text-[#F0B100]"}`} />
+                {!isCollapsed && <span className="text-sm">{item.name}</span>}
+                {!isCollapsed && isActive && <div className="ml-auto w-1 h-1 rounded-full bg-[#F0B100]"></div>}
               </>
             )}
           </NavLink>
@@ -90,14 +100,14 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Actions */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-        <div className="space-y-1">
+      <div className="p-2 border-t border-[#2C3E3F] bg-[#324546]">
+        <div className="space-y-0.5">
           <button
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-white hover:shadow-sm hover:text-indigo-600 transition
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[#B0C4C5] hover:bg-white/10 hover:shadow-sm hover:text-white transition
               ${isCollapsed ? "justify-center" : ""}`}
           >
-            <HelpCircle size={20} />
-            {!isCollapsed && <span className="text-sm font-medium">Help Center</span>}
+            <HelpCircle size={18} />
+            {!isCollapsed && <span className="text-xs font-medium">Help Center</span>}
           </button>
         </div>
       </div>

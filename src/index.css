@@ -1,112 +1,216 @@
 @import "tailwindcss";
 
-/* Core Theme Transitions */
-html,
+/* -------------------------------------------------------------------------- */
+/*                                 TYPOGRAPHY                                 */
+/* -------------------------------------------------------------------------- */
+/* Using system fonts stack that mimics Inter for performance + premium feel */
 body {
-    transition: background-color 0.5s ease, color 0.3s ease;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Light Theme (Default) */
-.theme-light body {
-    @apply bg-gray-50 text-gray-900;
+/* -------------------------------------------------------------------------- */
+/*                               GLOBAL THEME                                 */
+/* -------------------------------------------------------------------------- */
+body {
+    @apply bg-[#F9F7F1] text-slate-900;
+    transition: background-color 0.3s ease, color 0.2s ease;
 }
 
-
-/* Premium Dark Glass Theme */
-.theme-gradient body {
-    background: rgb(2, 0, 36);
-    background: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%) !important;
-    background-attachment: fixed !important;
-    color: white !important;
+/* -------------------------------------------------------------------------- */
+/*                          RESPONSIVE SCROLLBARS                             */
+/* -------------------------------------------------------------------------- */
+/* Thinner scrollbars on mobile for better UX */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
 }
 
-/* 
-   GLASSMORPHISM OVERRIDES 
-   The goal: Turn "white" cards into "transparent dark glass" cards.
-*/
-
-/* Override bg-white to be transparent glass */
-.theme-gradient .bg-white,
-.theme-gradient .bg-gray-50,
-.theme-gradient .bg-gray-100 {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    /* Low opacity white = Glassy */
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+@media (min-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
 }
 
-/* Sidebar Specific - slightly different tint */
-.theme-gradient aside {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    /* Darker glass for sidebar */
-    backdrop-filter: blur(20px) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* Navbar Specific */
-.theme-gradient nav {
-    background-color: rgba(2, 0, 36, 0.8) !important;
-    /* Matches deepest blue */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
 }
 
-/* TEXT COLOR OVERRIDES */
-/* Force all text to be white or light gray in this theme */
-.theme-gradient .text-gray-900,
-.theme-gradient .text-gray-800,
-.theme-gradient .text-gray-700,
-.theme-gradient .text-gray-600 {
-    color: rgba(255, 255, 255, 0.95) !important;
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
 }
 
-.theme-gradient .text-gray-500,
-.theme-gradient .text-gray-400 {
-    color: rgba(255, 255, 255, 0.7) !important;
-}
-
-/* Inputs needs to be visible */
-.theme-gradient input,
-.theme-gradient select,
-.theme-gradient textarea {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    color: white !important;
-}
-
-.theme-gradient input::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Tables */
-.theme-gradient thead {
-    background-color: rgba(0, 0, 0, 0.2) !important;
-}
-
-.theme-gradient tr:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.theme-gradient td,
-.theme-gradient th {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
-}
-
+/* -------------------------------------------------------------------------- */
+/*                          RESPONSIVE ANIMATIONS                             */
+/* -------------------------------------------------------------------------- */
 @layer utilities {
     .animate-fade-in {
-        animation: fadeIn 0.5s ease-out;
+        animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .glass-panel {
+        @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+    }
+
+    /* Touch-friendly minimum sizes */
+    .touch-target {
+        @apply min-h-[44px] min-w-[44px];
+    }
+
+    /* Responsive container with proper padding */
+    .container-responsive {
+        @apply px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
+    }
+
+    /* Mobile-first spacing utilities */
+    .spacing-y-responsive {
+        @apply space-y-4 md:space-y-6 lg:space-y-8;
+    }
+
+    .spacing-x-responsive {
+        @apply space-x-2 md:space-x-4 lg:space-x-6;
     }
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                      RESPONSIVE COMPONENT OVERRIDES                        */
+/* -------------------------------------------------------------------------- */
+
+/* Premium Inputs - Touch-friendly on mobile */
+input,
+select,
+textarea {
+    @apply transition-all duration-200;
+    min-height: 44px;
+    /* Touch-friendly */
+}
+
+@media (min-width: 768px) {
+
+    input,
+    select,
+    textarea {
+        min-height: 40px;
+    }
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    @apply ring-2 ring-indigo-500/20 border-indigo-500 shadow-sm;
+}
+
+/* Premium Buttons - Touch-friendly */
+button {
+    @apply transition-all duration-200;
+    min-height: 44px;
+    /* Touch-friendly */
+}
+
+button:active {
+    @apply transform scale-[0.98];
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          RESPONSIVE TABLE UTILITIES                        */
+/* -------------------------------------------------------------------------- */
+/* Horizontal scroll wrapper for tables on mobile */
+.table-responsive {
+    @apply overflow-x-auto -mx-4 sm:mx-0;
+}
+
+.table-responsive table {
+    @apply min-w-full;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          MODAL RESPONSIVE UTILITIES                        */
+/*-------------------------------------------------------------------------- */
+/* Full-screen modals on mobile, centered on desktop */
+.modal-responsive {
+    @apply fixed inset-0 z-50 flex items-end sm:items-center justify-center;
+}
+
+.modal-content-responsive {
+    @apply w-full h-auto max-h-[85vh] sm:max-w-md sm:rounded-2xl overflow-y-auto;
+    @apply rounded-t-3xl sm:rounded-3xl;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          GRID RESPONSIVE UTILITIES                         */
+/* -------------------------------------------------------------------------- */
+/* Common responsive grid patterns */
+.grid-responsive-1-2-3 {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4;
+}
+
+.grid-responsive-1-2-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4;
+}
+
+.grid-responsive-1-3 {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          DARK MODE SUPPORT                                 */
+/* -------------------------------------------------------------------------- */
+.theme-gradient body {
+    @apply bg-slate-900 text-white;
+}
+
+.theme-gradient ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600;
+}
+
+.theme-gradient ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
 }
