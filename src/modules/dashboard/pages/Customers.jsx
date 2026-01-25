@@ -46,32 +46,33 @@ const Customers = () => {
     return (
         <div className="container-responsive spacing-y-responsive animate-fade-in">
             {/* Header */}
-            <div className="flex flex-col gap-4">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2 sm:gap-3">
-                        <Users className="text-indigo-600" size={28} />
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2 sm:gap-3">
+                        <Users className="text-slate-700" size={32} />
                         Customer Directory
                     </h1>
-                    <p className="text-sm sm:text-base text-slate-500 mt-1 font-medium">Manage client accounts, credit limits, and payment history.</p>
+                    <p className="text-sm text-slate-500 mt-1 font-medium max-w-lg">Manage client accounts, credit limits, and purchase history.</p>
                 </div>
                 <Button
                     onClick={() => setShowAddModal(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 font-bold px-6 w-full sm:w-auto"
+                    className="bg-[#F0B100] hover:bg-[#D49B00] text-slate-900 shadow-lg shadow-yellow-200/50 font-black uppercase tracking-wider text-xs px-6 h-10 w-full sm:w-auto transition-all transform hover:-translate-y-0.5"
                 >
-                    <UserPlus size={18} className="mr-2" /> Add New Customer
+                    <UserPlus size={16} className="mr-2" /> Add Customer
                 </Button>
             </div>
 
             {/* Search & Stats */}
             <div className="flex flex-col gap-4 sm:gap-6">
-                <Card className="flex-1 border-none shadow-sm bg-white">
-                    <div className="p-2 flex items-center gap-2">
-                        <Search className="ml-4 text-slate-400" size={20} />
+                <Card className="flex-1 border-none shadow-sm bg-white ring-1 ring-slate-100">
+                    <div className="p-1 flex items-center gap-2">
+                        <Search className="ml-3 text-slate-400" size={18} />
                         <Input
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Search by name, phone, or ID..."
-                            className="border-none shadow-none text-base sm:text-lg h-12 bg-transparent"
+                            className="border-none shadow-none text-sm font-medium h-10 bg-transparent placeholder:text-slate-300"
                         />
                     </div>
                 </Card>
@@ -114,14 +115,14 @@ const Customers = () => {
                                     <tr key={customer.id} className="group hover:bg-slate-50/80 transition-colors">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-black border-2 border-white shadow-sm
-                                                    ${isDebtor ? 'bg-rose-100 text-rose-600' : 'bg-indigo-100 text-indigo-600'}`
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shadow-sm
+                                                    ${isDebtor ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-600'}`
                                                 }>
                                                     {customer.name.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-slate-900 text-base">{customer.name}</h3>
-                                                    <Badge variant="secondary" className="mt-1 text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                                                    <h3 className="font-bold text-slate-900 text-sm">{customer.name}</h3>
+                                                    <Badge variant="secondary" className="mt-0.5 text-[9px] font-bold uppercase tracking-wider bg-slate-50 text-slate-400 border border-slate-100">
                                                         {customer.type || "Retailer"}
                                                     </Badge>
                                                 </div>
@@ -130,12 +131,12 @@ const Customers = () => {
 
                                         <td className="py-4 px-6">
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
-                                                    <Phone size={14} className="text-slate-300" />
+                                                <div className="flex items-center gap-2 text-slate-500 font-medium text-xs">
+                                                    <Phone size={12} className="text-slate-300" />
                                                     {customer.contact || "No Phone"}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-slate-400 text-xs">
-                                                    <MapPin size={14} className="text-slate-300" />
+                                                <div className="flex items-center gap-2 text-slate-400 text-[10px]">
+                                                    <MapPin size={12} className="text-slate-300" />
                                                     {customer.address || "No Address"}
                                                 </div>
                                             </div>
@@ -164,20 +165,20 @@ const Customers = () => {
 
                                         <td className="py-4 px-6 text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="hover:bg-slate-200 text-slate-400 hover:text-indigo-600">
-                                                    <History size={18} />
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-slate-100 text-slate-400 hover:text-slate-700">
+                                                    <History size={16} />
                                                 </Button>
                                                 {isDebtor ? (
                                                     <Button
                                                         size="sm"
                                                         onClick={() => setPaymentModal({ open: true, customer: customer })}
-                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200"
+                                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] h-8 px-3 shadow-md shadow-emerald-100 uppercase tracking-wide"
                                                     >
-                                                        Collect <ArrowRight size={14} className="ml-1" />
+                                                        Collect <ArrowRight size={12} className="ml-1" />
                                                     </Button>
                                                 ) : (
-                                                    <Button variant="ghost" size="icon" className="text-slate-300">
-                                                        <MoreHorizontal size={18} />
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-300 hover:text-slate-500">
+                                                        <MoreHorizontal size={16} />
                                                     </Button>
                                                 )}
                                             </div>
@@ -236,7 +237,7 @@ const Customers = () => {
                                         <option>Individual</option>
                                     </select>
                                 </div>
-                                <Button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
+                                <Button type="submit" className="w-full mt-4 bg-[#F0B100] hover:bg-[#D49B00] text-slate-900 font-bold shadow-lg shadow-yellow-200/50">
                                     Create Account
                                 </Button>
                             </form>

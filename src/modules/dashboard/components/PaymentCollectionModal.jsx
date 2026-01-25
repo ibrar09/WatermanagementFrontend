@@ -126,12 +126,14 @@ const PaymentCollectionModal = ({ customer, onClose, onCollect }) => {
                             </div>
                         </div>
 
-                        <Button
-                            type="submit"
-                            className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg uppercase tracking-widest shadow-lg shadow-emerald-200 rounded-xl"
-                        >
-                            <CheckCircle2 className="mr-2" size={24} /> Confirm Payment
-                        </Button>
+                        <div className="flex justify-end pt-4">
+                            <Button
+                                type="submit"
+                                className="h-11 px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-200 rounded-lg"
+                            >
+                                <CheckCircle2 className="mr-2" size={18} /> Confirm Payment
+                            </Button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>

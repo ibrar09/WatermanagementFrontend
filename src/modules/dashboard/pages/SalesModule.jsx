@@ -17,8 +17,7 @@ import PaymentCollectionModal from "../components/PaymentCollectionModal";
 
 const SalesModule = () => {
     const { inventory, transactions, customers, sellStock, addCustomer, collectPayment } = useData();
-    const [showNewSaleModal, setShowNewSaleModal] = useState(false);
-    const [showLedgerModal, setShowLedgerModal] = useState(false);
+    const [activeView, setActiveView] = useState("TRANSACTIONS"); // 'TRANSACTIONS' | 'LEDGER' | 'NEW_SALE'
 
     // Payment Modal for Collection Tab
     const [paymentModal, setPaymentModal] = useState({ open: false, customer: null });
@@ -69,7 +68,7 @@ const SalesModule = () => {
 
         if (success) {
             alert("Sale Recorded Successfully!");
-            setShowNewSaleModal(false);
+            setActiveView("TRANSACTIONS");
         }
     };
 
@@ -85,229 +84,259 @@ const SalesModule = () => {
         <>
             <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 animate-fade-in p-3 sm:p-4">
                 {/* Header & Stats */}
-                <div className="flex flex-col gap-3 sm:gap-4">
+                {/* Header Row */}
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-2">
+                    {/* Left: Title */}
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <div className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-bold uppercase tracking-widest rounded-md">Transactions</div>
+                            <div className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-bold uppercase tracking-widest rounded-md">Sales & POS</div>
                         </div>
-                        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                            <ShoppingCart className="text-indigo-600" size={24} />
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 flex items-center gap-2 tracking-tight">
+                            <ShoppingCart className="text-indigo-600" size={32} />
                             Sales Terminal
                         </h1>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">Manage point of sale, customer ledgers, and receivables.</p>
+                        <p className="text-sm text-slate-500 mt-1 font-medium tracking-wide max-w-lg">
+                            Manage transactions, customer ledgers, and process new sales from a single unified view.
+                        </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <div className="flex flex-col xs:flex-row gap-2 flex-1">
-                            <Button
-                                onClick={() => setShowNewSaleModal(true)}
-                                className="bg-[#F0B100] hover:bg-[#D49B00] text-slate-900 shadow-xl shadow-yellow-200/50 font-black uppercase tracking-wider flex-1 xs:flex-none"
-                            >
-                                <Plus size={16} className="mr-2" /> Process Sale
-                            </Button>
-                            <Button
-                                onClick={() => setShowLedgerModal(true)}
-                                className="bg-white border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold flex-1 xs:flex-none"
-                            >
-                                <Users size={16} className="mr-2" /> Ledger
-                            </Button>
-                        </div>
-
-                        <Card className="border-l-0 border-y-0 border-r-[6px] border-r-emerald-500 bg-white shadow-md hover:shadow-xl transition-all">
-                            <CardContent className="p-3">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
-                                        <DollarSign size={18} />
-                                    </div>
-                                </div>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Revenue</p>
-                                <p className="text-lg sm:text-xl font-black text-slate-900">Rs. {totalRevenue.toLocaleString()}</p>
-                            </CardContent>
-                        </Card>
+                    {/* Right: View Switcher Tabs */}
+                    <div className="flex items-center bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm gap-1 self-start lg:self-auto">
+                        <button
+                            onClick={() => setActiveView("TRANSACTIONS")}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeView === "TRANSACTIONS"
+                                ? "bg-indigo-50 text-indigo-600 shadow-sm ring-1 ring-indigo-200"
+                                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                                }`}
+                        >
+                            <History size={16} /> Transactions
+                        </button>
+                        <div className="w-px h-6 bg-slate-200 mx-1"></div>
+                        <button
+                            onClick={() => setActiveView("LEDGER")}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeView === "LEDGER"
+                                ? "bg-indigo-50 text-indigo-600 shadow-sm ring-1 ring-indigo-200"
+                                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                                }`}
+                        >
+                            <Users size={16} /> Customer Ledger
+                        </button>
+                        <div className="w-px h-6 bg-slate-200 mx-1"></div>
+                        <button
+                            onClick={() => setActiveView("NEW_SALE")}
+                            className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${activeView === "NEW_SALE"
+                                ? "bg-[#F0B100] text-slate-900 shadow-md ring-1 ring-yellow-400 transform scale-105"
+                                : "bg-slate-100 text-slate-400 hover:bg-yellow-100 hover:text-yellow-700"
+                                }`}
+                        >
+                            <Plus size={16} /> Process Sale
+                        </button>
                     </div>
                 </div>
 
-
-            </div>
-
-            {/* Main Content: Conditional - Form or Transaction Logs */}
-            {showNewSaleModal ? (
-                <ProcessSaleModal
-                    isOpen={true}
-                    onClose={() => setShowNewSaleModal(false)}
-                    onSubmit={handleProcessSale}
-                    inventory={inventory}
-                    customers={customers}
-                    onAddCustomer={() => {
-                        setShowNewSaleModal(false);
-                        setShowAddCustomer(true);
-                    }}
-                />
-            ) : (
-                <Card className="overflow-hidden animate-fade-in shadow-xl border-none bg-white">
-                    <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                        <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                            <History className="text-slate-400" size={18} /> Transaction Logs
-                        </CardTitle>
-                    </CardHeader>
-                    <div className="max-h-[400px] sm:max-h-[600px] overflow-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-transparent">
-                                    <TableHead className="font-bold text-slate-400">Time / Date</TableHead>
-                                    <TableHead className="font-bold text-slate-400">Client</TableHead>
-                                    <TableHead className="font-bold text-slate-400">Activity</TableHead>
-                                    <TableHead className="font-bold text-slate-400">Total Amount</TableHead>
-                                    <TableHead className="font-bold text-slate-400">Payment Info</TableHead>
-                                    <TableHead className="font-bold text-slate-400">Status</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {salesHistory.map((t) => (
-                                    <TableRow key={t.id} className="group hover:bg-slate-50">
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <Clock size={14} className="text-slate-400" />
-                                                <div>
-                                                    <p className="font-bold text-slate-700 text-xs">{t.date}</p>
-                                                    <p className="text-[10px] text-slate-400">{t.time}</p>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p className="font-bold text-slate-800">{t.client}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            {t.type === 'SELL' ? (
-                                                <div className="flex items-center gap-2">
-                                                    <ArrowDownRight size={14} className="text-emerald-500" />
-                                                    <span className="text-xs font-bold text-slate-500">Sale: {t.itemName} ({t.quantity})</span>
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-2">
-                                                    <ArrowUpRight size={14} className="text-blue-500" />
-                                                    <span className="text-xs font-bold text-slate-500">Payment Collection</span>
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <p className="font-black text-slate-900">${Number(t.total).toLocaleString()}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            {t.type === 'SELL' && (
-                                                <div className="text-[10px]">
-                                                    <p className="text-emerald-600 font-bold">PAID: ${Number(t.amountPaid).toLocaleString()}</p>
-                                                    {t.balanceDue > 0 && <p className="text-rose-500 font-black">DUE: ${Number(t.balanceDue).toLocaleString()}</p>}
-                                                </div>
-                                            )}
-                                            {t.type === 'PAYMENT' && t.paymentMethod && (
-                                                <div className="text-[10px] text-slate-500">
-                                                    <p className="font-bold text-slate-700">{t.paymentMethod}</p>
-                                                    {t.reference && <p>Ref: {t.reference}</p>}
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                className={
-                                                    t.status === 'PAID' ? 'bg-emerald-100 text-emerald-700 border-none' :
-                                                        t.status === 'PARTIAL' ? 'bg-amber-100 text-amber-700 border-none' :
-                                                            t.status === 'CREDIT' ? 'bg-rose-100 text-rose-700 border-none' : 'bg-slate-100 text-slate-500'
-                                                }
-                                            >
-                                                {t.status}
-                                            </Badge>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {salesHistory.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="p-12 text-center text-slate-400 italic">No sales or payments record found.</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </Card>
-            )}
-
-            {/* CUSTOMER LEDGER MODAL */}
-            {
-                showLedgerModal && (
-                    <div className="modal-responsive p-4 sm:p-6 backdrop-blur-md bg-black/40">
-                        <div className="modal-content-responsive max-w-6xl bg-[#F9F7F1] shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-300">
-                            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200 p-4 sm:p-6 flex justify-between items-center">
-                                <div>
-                                    <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-slate-900 flex items-center gap-2">
-                                        <Users className="text-[#F0B100]" size={20} /> Customer Ledger
-                                    </h2>
-                                    <p className="text-slate-500 text-xs sm:text-sm font-medium">Manage retailers, collect payments, and track debts.</p>
-                                </div>
-                                <Button variant="ghost" size="icon" onClick={() => setShowLedgerModal(false)} className="rounded-full hover:bg-slate-100">
-                                    <X size={20} />
-                                </Button>
+                {/* Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <Card className="border-l-[4px] border-l-emerald-500 shadow-sm hover:shadow-md transition-all">
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Revenue</p>
+                                <p className="text-2xl font-black text-slate-900">Rs. {totalRevenue.toLocaleString()}</p>
                             </div>
-                            <div className="p-4 sm:p-6">
-                                <div className="grid-responsive-1-2-4">
-                                    {customers.map(c => {
-                                        const isDebtor = c.balance > 0;
-                                        const borderColor = isDebtor ? "border-r-rose-500" : "border-r-emerald-500";
-                                        const bgBadge = isDebtor ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600";
+                            <div className="p-3 bg-emerald-100 text-emerald-600 rounded-2xl">
+                                <Activity size={20} />
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-l-[4px] border-l-rose-500 shadow-sm hover:shadow-md transition-all">
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Outstanding</p>
+                                <p className="text-2xl font-black text-slate-900">Rs. {totalOutstanding.toLocaleString()}</p>
+                            </div>
+                            <div className="p-3 bg-rose-100 text-rose-600 rounded-2xl">
+                                <AlertCircle size={20} />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
+                {/* Main Content: Transaction Logs */}
+                {activeView === "TRANSACTIONS" && (
+                    <Card className="overflow-hidden animate-fade-in shadow-xl border-none bg-white">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+                            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                                <History className="text-slate-400" size={18} /> Transaction Logs
+                            </CardTitle>
+                        </CardHeader>
+                        <div className="max-h-[400px] sm:max-h-[600px] overflow-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead className="font-bold text-slate-400">Time / Date</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Client</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Activity</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Total Amount</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Payment Info</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {salesHistory.map((t) => (
+                                        <TableRow key={t.id} className="group hover:bg-slate-50">
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Clock size={14} className="text-slate-400" />
+                                                    <div>
+                                                        <p className="font-bold text-slate-700 text-xs">{t.date}</p>
+                                                        <p className="text-[10px] text-slate-400">{t.time}</p>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-bold text-slate-800">{t.client}</p>
+                                            </TableCell>
+                                            <TableCell>
+                                                {t.type === 'SELL' ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <ArrowDownRight size={14} className="text-emerald-500" />
+                                                        <span className="text-xs font-bold text-slate-500">Sale: {t.itemName} ({t.quantity})</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <ArrowUpRight size={14} className="text-blue-500" />
+                                                        <span className="text-xs font-bold text-slate-500">Payment Collection</span>
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-black text-slate-900">${Number(t.total).toLocaleString()}</p>
+                                            </TableCell>
+                                            <TableCell>
+                                                {t.type === 'SELL' && (
+                                                    <div className="text-[10px]">
+                                                        <p className="text-emerald-600 font-bold">PAID: ${Number(t.amountPaid).toLocaleString()}</p>
+                                                        {t.balanceDue > 0 && <p className="text-rose-500 font-black">DUE: ${Number(t.balanceDue).toLocaleString()}</p>}
+                                                    </div>
+                                                )}
+                                                {t.type === 'PAYMENT' && t.paymentMethod && (
+                                                    <div className="text-[10px] text-slate-500">
+                                                        <p className="font-bold text-slate-700">{t.paymentMethod}</p>
+                                                        {t.reference && <p>Ref: {t.reference}</p>}
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={
+                                                        t.status === 'PAID' ? 'bg-emerald-100 text-emerald-700 border-none' :
+                                                            t.status === 'PARTIAL' ? 'bg-amber-100 text-amber-700 border-none' :
+                                                                t.status === 'CREDIT' ? 'bg-rose-100 text-rose-700 border-none' : 'bg-slate-100 text-slate-500'
+                                                    }
+                                                >
+                                                    {t.status}
+                                                </Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {salesHistory.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="p-12 text-center text-slate-400 italic">No sales or payments record found.</TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </Card>
+                )}
+
+                {/* Main Content: Customer Ledger */}
+                {activeView === "LEDGER" && (
+                    <Card className="overflow-hidden animate-fade-in shadow-xl border-none bg-white">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
+                            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                                <Users className="text-slate-400" size={18} /> Customer Ledger
+                            </CardTitle>
+                            <Button size="sm" onClick={() => setShowAddCustomer(true)} className="h-8">
+                                <UserPlus size={14} className="mr-2" /> Add Customer
+                            </Button>
+                        </CardHeader>
+                        <div className="max-h-[600px] overflow-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead className="font-bold text-slate-400">Customer Name</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Contact</TableHead>
+                                        <TableHead className="font-bold text-slate-400 text-right">Balance Due</TableHead>
+                                        <TableHead className="font-bold text-slate-400">Status</TableHead>
+                                        <TableHead className="font-bold text-slate-400 text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {customers.map((c) => {
+                                        const isDebtor = c.balance > 0;
                                         return (
-                                            <Card key={c.id} className={`group border-y-0 border-l-0 border-r-[6px] ${borderColor} hover:shadow-xl transition-all shadow-sm bg-white`}>
-                                                <CardContent className="p-6">
-                                                    <div className="flex justify-between items-start mb-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 font-black text-xl shadow-sm">
+                                            <TableRow key={c.id} className="group hover:bg-slate-50">
+                                                <TableCell className="font-bold text-slate-800">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
                                                             {c.name.charAt(0)}
                                                         </div>
-                                                        <Badge variant="outline" className={`border-transparent ${bgBadge}`}>
-                                                            {isDebtor ? "DEBTOR" : "CLEAR"}
-                                                        </Badge>
+                                                        {c.name}
                                                     </div>
-                                                    <h3 className="font-black text-slate-800 text-lg tracking-tight truncate" title={c.name}>{c.name}</h3>
-                                                    <p className="text-xs text-slate-400 font-bold mb-4 flex items-center gap-1">
-                                                        <Users size={12} /> {c.phone || "No contact info"}
-                                                    </p>
-
-                                                    <div className="pt-4 border-t border-slate-100">
-                                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Current Balance</p>
-                                                        <p className={`text-2xl font-black ${isDebtor ? "text-rose-500" : "text-emerald-500"}`}>
-                                                            ${Number(c.balance || 0).toLocaleString()}
-                                                        </p>
-                                                    </div>
-
+                                                </TableCell>
+                                                <TableCell className="text-sm text-slate-500 font-medium">
+                                                    {c.phone || "No Phone"} <br />
+                                                    <span className="text-[10px] opacity-70">{c.address}</span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <span className={`font-black ${isDebtor ? "text-rose-500" : "text-emerald-500"}`}>
+                                                        ${Number(c.balance || 0).toLocaleString()}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge className={isDebtor ? 'bg-rose-100 text-rose-700 border-none' : 'bg-emerald-100 text-emerald-700 border-none'}>
+                                                        {isDebtor ? "OUTSTANDING" : "CLEARED"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
                                                     {isDebtor && (
                                                         <Button
-                                                            onClick={() => setPaymentModal({ open: true, customer: c })}
                                                             size="sm"
-                                                            className="mt-4 w-full bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 font-bold border-rose-200"
+                                                            onClick={() => setPaymentModal({ open: true, customer: c })}
+                                                            className="h-7 text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 border-indigo-200"
                                                         >
-                                                            COLLECT PAYMENT
+                                                            Collect
                                                         </Button>
                                                     )}
-                                                </CardContent>
-                                            </Card>
-                                        )
+                                                </TableCell>
+                                            </TableRow>
+                                        );
                                     })}
-                                    <Card
-                                        className="border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all min-h-[250px]"
-                                        onClick={() => setShowAddCustomer(true)}
-                                    >
-                                        <CardContent className="flex flex-col items-center p-6">
-                                            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors mb-4">
-                                                <UserPlus size={24} />
-                                            </div>
-                                            <h3 className="font-bold text-slate-600 group-hover:text-indigo-700">Register Customer</h3>
-                                            <p className="text-xs text-slate-400 mt-2">Add new client to ledger</p>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </div>
+                                </TableBody>
+                            </Table>
                         </div>
-                    </div>
-                )
-            }
+
+                    </Card>
+                )}
+
+                {/* PROCESS SALE VIEW */}
+                {
+                    activeView === "NEW_SALE" && (
+                        <ProcessSaleModal
+                            isOpen={true}
+                            onClose={() => setActiveView("TRANSACTIONS")}
+                            onSubmit={handleProcessSale}
+                            inventory={inventory}
+                            customers={customers}
+                            onAddCustomer={() => {
+                                // Keep current view but open customer modal
+                                setShowAddCustomer(true);
+                            }}
+                        />
+                    )
+                }
+
+            </div >
 
             {/* CUSTOMER MODAL */}
             {
@@ -359,9 +388,9 @@ const SalesModule = () => {
                                             <option>Individual</option>
                                         </select>
                                     </div>
-                                    <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 mt-8 pt-4">
-                                        <Button type="button" variant="ghost" onClick={() => setShowAddCustomer(false)} className="flex-1">Cancel</Button>
-                                        <Button type="submit" className="flex-1">Register Customer</Button>
+                                    <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 mt-8 pt-4 justify-end">
+                                        <Button type="button" variant="ghost" onClick={() => setShowAddCustomer(false)}>Cancel</Button>
+                                        <Button type="submit" className="px-8">Register Customer</Button>
                                     </div>
                                 </form>
                             </CardContent>

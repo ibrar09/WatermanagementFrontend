@@ -60,11 +60,11 @@ export default function Dashboard() {
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Executive Dashboard</h1>
-          <p className="text-sm sm:text-base text-slate-500 font-medium">Financial Health & Company Trajectory</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-gradient tracking-tight">Executive Dashboard</h1>
+          <p className="text-sm sm:text-base text-slate-500 font-medium tracking-wide">Financial Health & Company Trajectory</p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => navigate("/sales")}>
+          <Button onClick={() => navigate("/sales")} className="shadow-premium hover:shadow-premium-hover transition-all">
             <ShoppingCart className="mr-2 h-4 w-4" /> New Sale
           </Button>
         </div>
@@ -87,8 +87,13 @@ export default function Dashboard() {
                 <Badge variant="outline" className={`border-white/20 text-white px-3 py-1 uppercase tracking-widest ${financial.netProfit >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"}`}>
                   Company Status
                 </Badge>
-                <span className="text-xs sm:text-sm font-bold opacity-70 italic">
+                <span className="text-xs sm:text-sm font-bold opacity-70 italic flex items-center gap-2">
                   {financial.netProfit >= 0 ? "Profitable & Growing" : "Operating at Loss"}
+                  {financial.netProfit >= 0 && (
+                    <span className="bg-emerald-400/20 text-emerald-300 text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5 not-italic">
+                      <TrendingUp size={10} /> +12.5%
+                    </span>
+                  )}
                 </span>
               </div>
 
@@ -158,23 +163,23 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
 
         {/* WATERFALL CHART */}
-        <Card className="border-none shadow-lg bg-white">
+        <Card className="border-none shadow-premium bg-white hover:shadow-premium-hover transition-smooth">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="text-blue-500" size={20} /> Profit Waterfall
+            <CardTitle className="flex items-center gap-2 text-slate-700">
+              <TrendingUp className="text-[#F0B100]" size={18} /> Profit Waterfall
             </CardTitle>
             <CardDescription>
-              Visualizing how Revenue is reduced by Costs to calculate Net Profit.
+              Visualizing how Revenue is reduced by Costs.
             </CardDescription>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={waterfallData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 11, fontWeight: 'bold', fill: '#64748b' }} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="amount" barSize={32} radius={[0, 4, 4, 0]}>
+                <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 11, fontWeight: '600', fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} />
+                <Bar dataKey="amount" barSize={32} radius={[0, 6, 6, 0]}>
                   {waterfallData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
@@ -185,13 +190,13 @@ export default function Dashboard() {
         </Card>
 
         {/* EXPENSE DISTRIBUTION */}
-        <Card className="border-none shadow-lg bg-white">
+        <Card className="border-none shadow-premium bg-white hover:shadow-premium-hover transition-smooth">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Factory className="text-rose-500" size={20} /> Cost Distribution
+            <CardTitle className="flex items-center gap-2 text-slate-700">
+              <Factory className="text-rose-500" size={18} /> Cost Distribution
             </CardTitle>
             <CardDescription>
-              Where is the money going? Breakdown of all outflows.
+              Breakdown of all operational outflows.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col md:flex-row items-center justify-center gap-8 h-80">

@@ -59,13 +59,13 @@ export default function Sidebar() {
       {/* Brand Logo */}
       <div className={`h-16 flex items-center px-4 ${isCollapsed ? 'justify-center' : ''}`}>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-base shadow-lg border border-white/10">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-white/20 to-white/5 text-white flex items-center justify-center font-bold text-base shadow-lg border border-white/10 backdrop-blur-sm">
             W
           </div>
           {!isCollapsed && (
             <div className="flex flex-col">
-              <span className="text-base font-bold text-[#F0B100] leading-tight">WaterSys</span>
-              <span className="text-[9px] uppercase font-bold text-[#8FA5A6] tracking-wider">Logistics</span>
+              <span className="text-base font-black text-[#F0B100] leading-tight tracking-tight">WaterSys</span>
+              <span className="text-[9px] uppercase font-bold text-[#8FA5A6] tracking-widest">Logistics</span>
             </div>
           )}
         </div>
